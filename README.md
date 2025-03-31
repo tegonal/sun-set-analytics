@@ -14,10 +14,9 @@
 -->
 <!-- for release end -->
 
->>>>>>> 44d8ab9 (initialised)
 # sun-set-analytics
 
-TODO #1 <add project description>
+This project enables users to analyse the degradation of their solar panels over time
 
 ---
 ❗ You are taking a *sneak peek* at the next version. It could be that some features you find on this page are not
@@ -36,13 +35,11 @@ version: [README of v0.1.0](https://github.com/tegonal/sun-set-analytics/tree/ma
 
 # Installation
 
-TODO #2 <adjust if not published to maven central>
-sun-set-analytics is published to maven central.
+use pnpm dev
 
 # Documentation
 
-TODO #3 <adjust if not published to github pages>
-Code documentation can be found on github-pages: <https://tegonal.github.io/sun-set-analytics>.
+doc 
 
 # Contributors and contribute
 
