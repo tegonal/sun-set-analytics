@@ -68,15 +68,23 @@ export interface Config {
   blocks: {};
   collections: {
     users: User;
-    media: Media;
+    installations: Installation;
+    pv_production: PvProduction;
+    pv_production_monthly_stats: PvProductionMonthlyStat;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
   };
-  collectionsJoins: {};
+  collectionsJoins: {
+    users: {
+      installations: 'installations';
+    };
+  };
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
-    media: MediaSelect<false> | MediaSelect<true>;
+    installations: InstallationsSelect<false> | InstallationsSelect<true>;
+    pv_production: PvProductionSelect<false> | PvProductionSelect<true>;
+    pv_production_monthly_stats: PvProductionMonthlyStatsSelect<false> | PvProductionMonthlyStatsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -119,6 +127,11 @@ export interface UserAuthOperations {
  */
 export interface User {
   id: number;
+  installations?: {
+    docs?: (number | Installation)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -132,22 +145,75 @@ export interface User {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "media".
+ * via the `definition` "installations".
  */
-export interface Media {
+export interface Installation {
   id: number;
-  alt: string;
+  owner: number | User;
+  name?: string | null;
+  longitude?: number | null;
+  latitude?: number | null;
+  panels?:
+    | {
+        /**
+         * This is the power that the manufacturer declares that the PV array can produce under standard test conditions, which are a constant 1000W of solar irradiance per square meter in the plane of the array, at an array temperature of 25°C. The peak power should be entered in kilowatt-peak (kWp). If you do not know the declared peak power of your modules but instead know the area of the modules (in m2) and the declared conversion efficiency (in percent), you can calculate the peak power as power (kWp) = 1 kW/m2 * area * efficiency / 100.
+         */
+        peak_power?: number | null;
+        /**
+         * This is the angle of the PV modules from the horizontal plane, for a fixed (non-tracking) mounting.
+         */
+        slope?: number | null;
+        /**
+         * The azimuth, or orientation, is the angle of the PV modules relative to the direction due South. -90° is East, 0° is South and 90° is West.
+         */
+        azimuth?: number | null;
+        id?: string | null;
+      }[]
+    | null;
   updatedAt: string;
   createdAt: string;
-  url?: string | null;
-  thumbnailURL?: string | null;
-  filename?: string | null;
-  mimeType?: string | null;
-  filesize?: number | null;
-  width?: number | null;
-  height?: number | null;
-  focalX?: number | null;
-  focalY?: number | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pv_production".
+ */
+export interface PvProduction {
+  id: number;
+  installation?: (number | null) | Installation;
+  from?: string | null;
+  to?: string | null;
+  /**
+   * Energy produced in kWh
+   */
+  energy?: number | null;
+  /**
+   * Loss of pv production data due to weather conditions as percentag (0-100%)
+   */
+  loss?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pv_production_monthly_stats".
+ */
+export interface PvProductionMonthlyStat {
+  id: number;
+  installation?: (number | null) | Installation;
+  year?: number | null;
+  month?: number | null;
+  energy?: {
+    /**
+     * measured production data kWh
+     */
+    measured_production?: number | null;
+    /**
+     * normalized production data kWh
+     */
+    normalized_production?: number | null;
+  };
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -161,8 +227,16 @@ export interface PayloadLockedDocument {
         value: number | User;
       } | null)
     | ({
-        relationTo: 'media';
-        value: number | Media;
+        relationTo: 'installations';
+        value: number | Installation;
+      } | null)
+    | ({
+        relationTo: 'pv_production';
+        value: number | PvProduction;
+      } | null)
+    | ({
+        relationTo: 'pv_production_monthly_stats';
+        value: number | PvProductionMonthlyStat;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -211,6 +285,7 @@ export interface PayloadMigration {
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
+  installations?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -223,21 +298,53 @@ export interface UsersSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "media_select".
+ * via the `definition` "installations_select".
  */
-export interface MediaSelect<T extends boolean = true> {
-  alt?: T;
+export interface InstallationsSelect<T extends boolean = true> {
+  owner?: T;
+  name?: T;
+  longitude?: T;
+  latitude?: T;
+  panels?:
+    | T
+    | {
+        peak_power?: T;
+        slope?: T;
+        azimuth?: T;
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
-  url?: T;
-  thumbnailURL?: T;
-  filename?: T;
-  mimeType?: T;
-  filesize?: T;
-  width?: T;
-  height?: T;
-  focalX?: T;
-  focalY?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pv_production_select".
+ */
+export interface PvProductionSelect<T extends boolean = true> {
+  installation?: T;
+  from?: T;
+  to?: T;
+  energy?: T;
+  loss?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pv_production_monthly_stats_select".
+ */
+export interface PvProductionMonthlyStatsSelect<T extends boolean = true> {
+  installation?: T;
+  year?: T;
+  month?: T;
+  energy?:
+    | T
+    | {
+        measured_production?: T;
+        normalized_production?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
