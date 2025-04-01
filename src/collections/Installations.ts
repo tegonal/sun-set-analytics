@@ -59,6 +59,86 @@ export const Installations: CollectionConfig = {
               'The azimuth, or orientation, is the angle of the PV modules relative to the direction due South. -90° is East, 0° is South and 90° is West.',
           },
         },
+        {
+          type: 'number',
+          name: 'system_loss',
+          defaultValue: 14,
+          min: 0,
+          max: 100,
+          admin: {
+            description:
+              'The estimated system losses are all the losses in the system, which cause the power actually delivered to the electricity grid to be lower than the power produced by the PV modules. There are several causes for this loss, such as losses in cables, power inverters, dirt (sometimes snow) on the modules and so on. Over the years the modules also tend to lose a bit of their power, so the average yearly output over the lifetime of the system will be a few percent lower than the output in the first years.',
+          },
+        },
+      ],
+    },
+    {
+      type: 'group',
+      name: 'PVGIS_config',
+      label: 'PVGIS configuration',
+      fields: [
+        {
+          type: 'checkbox',
+          name: 'enabled',
+          defaultValue: true,
+        },
+        {
+          type: 'select',
+          name: 'radiation_database',
+          defaultValue: 'PVGIS-SARAH3',
+          options: [
+            {
+              value: 'PVGIS-SARAH3',
+              label: 'PVGIS-SARAH3',
+            },
+            {
+              value: 'PVGIS-ERA5',
+              label: 'PVGIS-ERA5',
+            },
+          ],
+        },
+        {
+          type: 'select',
+          name: 'mounting_type',
+          defaultValue: '0',
+          options: [
+            {
+              value: '0',
+              label: 'Fixed',
+            },
+            {
+              value: '3',
+              label: 'Vertical axis',
+            },
+            {
+              value: '5',
+              label: 'Inclined axis',
+            },
+            {
+              value: '2',
+              label: 'Two axis',
+            },
+          ],
+        },
+        {
+          type: 'select',
+          name: 'pv_technology',
+          defaultValue: 'crystSi',
+          options: [
+            {
+              value: 'crystSi',
+              label: 'Crystalline silicon',
+            },
+            {
+              value: 'CIS',
+              label: 'CIS',
+            },
+            {
+              value: 'CdTe',
+              label: 'CdTe',
+            },
+          ],
+        },
       ],
     },
   ],

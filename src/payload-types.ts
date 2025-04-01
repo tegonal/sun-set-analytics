@@ -170,9 +170,19 @@ export interface Installation {
          * The azimuth, or orientation, is the angle of the PV modules relative to the direction due South. -90° is East, 0° is South and 90° is West.
          */
         azimuth?: number | null;
+        /**
+         * The estimated system losses are all the losses in the system, which cause the power actually delivered to the electricity grid to be lower than the power produced by the PV modules. There are several causes for this loss, such as losses in cables, power inverters, dirt (sometimes snow) on the modules and so on. Over the years the modules also tend to lose a bit of their power, so the average yearly output over the lifetime of the system will be a few percent lower than the output in the first years.
+         */
+        system_loss?: number | null;
         id?: string | null;
       }[]
     | null;
+  PVGIS_config?: {
+    enabled?: boolean | null;
+    radiation_database?: ('PVGIS-SARAH3' | 'PVGIS-ERA5') | null;
+    mounting_type?: ('0' | '3' | '5' | '2') | null;
+    pv_technology?: ('crystSi' | 'CIS' | 'CdTe') | null;
+  };
   updatedAt: string;
   createdAt: string;
 }
@@ -191,9 +201,9 @@ export interface PvProduction {
      */
     measured_production?: number | null;
     /**
-     * Estimated max production data in kWh for the given location and within the provided time window
+     * Estimated production data in kWh for the given location and within the provided time window
      */
-    estimated_max_production?: number | null;
+    estimated_production?: number | null;
     /**
      * Estimated loss of pv production data due to weather conditions as percentage (0-100%)
      */
@@ -319,7 +329,16 @@ export interface InstallationsSelect<T extends boolean = true> {
         peak_power?: T;
         slope?: T;
         azimuth?: T;
+        system_loss?: T;
         id?: T;
+      };
+  PVGIS_config?:
+    | T
+    | {
+        enabled?: T;
+        radiation_database?: T;
+        mounting_type?: T;
+        pv_technology?: T;
       };
   updatedAt?: T;
   createdAt?: T;
@@ -336,7 +355,7 @@ export interface PvProductionSelect<T extends boolean = true> {
     | T
     | {
         measured_production?: T;
-        estimated_max_production?: T;
+        estimated_production?: T;
         estimated_loss?: T;
       };
   updatedAt?: T;

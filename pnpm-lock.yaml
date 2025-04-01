@@ -23,9 +23,15 @@ importers:
       cross-env:
         specifier: ^7.0.3
         version: 7.0.3
+      date-fns:
+        specifier: ^4.1.0
+        version: 4.1.0
       graphql:
         specifier: ^16.8.1
         version: 16.10.0
+      ky:
+        specifier: ^1.8.0
+        version: 1.8.0
       next:
         specifier: 15.2.3
         version: 15.2.3(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.77.4)
@@ -2897,6 +2903,10 @@ packages:
   kleur@3.0.3:
     resolution: {integrity: sha512-eTIzlVOSUR+JxdDFepEYcBMtZ9Qqdef+rnzWdRZuMbOywu5tO2w2N7rqjoANZ5k9vywhL6Br1VRjUIgTQx4E8w==}
     engines: {node: '>=6'}
+
+  ky@1.8.0:
+    resolution: {integrity: sha512-DoKGmG27nT8t/1F9gV8vNzggJ3mLAyD49J8tTMWHeZvS8qLc7GlyTieicYtFzvDznMe/q2u38peOjkWc5/pjvw==}
+    engines: {node: '>=18'}
 
   language-subtag-registry@0.3.23:
     resolution: {integrity: sha512-0K65Lea881pHotoGEa5gDlMxt3pctLi2RplBb7Ezh4rRdLEOtgi7n4EwK9lamnUCkKBqaeKRVebTq6BAxSkpXQ==}
@@ -7428,6 +7438,8 @@ snapshots:
       json-buffer: 3.0.1
 
   kleur@3.0.3: {}
+
+  ky@1.8.0: {}
 
   language-subtag-registry@0.3.23: {}
 
