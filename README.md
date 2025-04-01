@@ -35,7 +35,11 @@ version: [README of v0.1.0](https://github.com/tegonal/sun-set-analytics/tree/ma
 
 # Installation
 
-use pnpm dev
+> As a pre-requisit, `pnpm` is required. Install it based on https://pnpm.io/installation.
+
+* Copy `src/.env.example` to `src/.env.local` and adjust configuration to your needs.
+* run `pnpm i`
+* run `pnpm dev`
 
 # Documentation
 
