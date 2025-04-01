@@ -182,14 +182,20 @@ export interface PvProduction {
   installation?: (number | null) | Installation;
   from?: string | null;
   to?: string | null;
-  /**
-   * Energy produced in kWh
-   */
-  energy?: number | null;
-  /**
-   * Loss of pv production data due to weather conditions as percentag (0-100%)
-   */
-  loss?: number | null;
+  energy?: {
+    /**
+     * Energy produced in kWh
+     */
+    measured_production?: number | null;
+    /**
+     * Estimated max production data in kWh for the given location and within the provided time window
+     */
+    estimated_max_production?: number | null;
+    /**
+     * Estimated loss of pv production data due to weather conditions as percentag (0-100%)
+     */
+    estimated_loss?: number | null;
+  };
   updatedAt: string;
   createdAt: string;
 }
@@ -324,8 +330,13 @@ export interface PvProductionSelect<T extends boolean = true> {
   installation?: T;
   from?: T;
   to?: T;
-  energy?: T;
-  loss?: T;
+  energy?:
+    | T
+    | {
+        measured_production?: T;
+        estimated_max_production?: T;
+        estimated_loss?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }
