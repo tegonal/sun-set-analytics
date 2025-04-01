@@ -132,6 +132,7 @@ export interface User {
     hasNextPage?: boolean;
     totalDocs?: number;
   };
+  role?: ('admin' | 'user') | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -305,6 +306,7 @@ export interface PayloadMigration {
  */
 export interface UsersSelect<T extends boolean = true> {
   installations?: T;
+  role?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
