@@ -63,6 +63,13 @@ export const PVProductionMonthlyStats: CollectionConfig = {
           },
         },
       ],
+    },{
+      name: 'owner',
+      type: 'relationship',
+      relationTo: 'users',
+      hasMany: false,
+      required: true,
+      index: true,
     },
   ],
 }

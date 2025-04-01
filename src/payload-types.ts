@@ -193,6 +193,7 @@ export interface Installation {
  */
 export interface PvProduction {
   id: number;
+  owner: number | User;
   installation?: (number | null) | Installation;
   from?: string | null;
   to?: string | null;
@@ -232,6 +233,7 @@ export interface PvProductionMonthlyStat {
      */
     expected_production?: number | null;
   };
+  owner: number | User;
   updatedAt: string;
   createdAt: string;
 }
@@ -350,6 +352,7 @@ export interface InstallationsSelect<T extends boolean = true> {
  * via the `definition` "pv_production_select".
  */
 export interface PvProductionSelect<T extends boolean = true> {
+  owner?: T;
   installation?: T;
   from?: T;
   to?: T;
@@ -377,6 +380,7 @@ export interface PvProductionMonthlyStatsSelect<T extends boolean = true> {
         measured_production?: T;
         expected_production?: T;
       };
+  owner?: T;
   updatedAt?: T;
   createdAt?: T;
 }
