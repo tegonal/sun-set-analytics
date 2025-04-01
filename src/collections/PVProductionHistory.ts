@@ -30,24 +30,34 @@ export const PVProductionHistory: CollectionConfig = {
       ],
     },
     {
-      type: 'row',
+      type: 'group',
+      name: 'energy',
       fields: [
         {
           type: 'number',
-          name: 'energy',
+          name: 'measured_production',
           admin: {
             description: 'Energy produced in kWh',
           },
         },
         {
           type: 'number',
-          name: 'loss',
-          min: 0,
-          max: 100,
-          defaultValue: 0,
+          name: 'estimated_max_production',
+          required: false,
           admin: {
             description:
-              'Loss of pv production data due to weather conditions as percentag (0-100%)',
+              'Estimated max production data in kWh for the given location and within the provided time window',
+          },
+        },
+        {
+          type: 'number',
+          name: 'estimated_loss',
+          min: 0,
+          max: 100,
+          required: false,
+          admin: {
+            description:
+              'Estimated loss of pv production data due to weather conditions as percentag (0-100%)',
           },
         },
       ],
