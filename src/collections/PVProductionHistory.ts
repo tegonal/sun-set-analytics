@@ -187,12 +187,14 @@ function calculateEstimatedProductionForTimeWindow(
 
       if (startTime >= from && endTime <= to) {
         // sum all hourly values full included in the time window
-        return value.P
+        // convert from W to kW
+        return value.P / 1000
       }
       if ((from >= startTime && from <= endTime) || (to >= startTime && to <= endTime)) {
         // partially included in the time window, calculate proportional value
+        // convert from W to kW
         const factor = (Math.min(to, endTime) - Math.max(from, startTime)) / (endTime - startTime)
-        return value.P * factor
+        return (value.P * factor) / 1000
       }
       // no part of the time window
       return undefined
