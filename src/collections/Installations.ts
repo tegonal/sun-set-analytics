@@ -1,4 +1,3 @@
-import { locationField } from '@/fields/location'
 import type { CollectionConfig } from 'payload'
 
 export const Installations: CollectionConfig = {
@@ -20,7 +19,10 @@ export const Installations: CollectionConfig = {
       type: 'text',
       name: 'name',
     },
-    locationField,
+    {
+      type: 'point',
+      name: 'location',
+    },
     {
       type: 'array',
       name: 'panels',
