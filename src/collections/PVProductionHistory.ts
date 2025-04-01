@@ -1,7 +1,30 @@
 import { Installation, PvProduction } from '@/payload-types'
 import { addHours, parse } from 'date-fns'
 import ky from 'ky'
-import { addDataAndFileToRequest, type CollectionConfig, type PayloadRequest } from 'payload'
+import {
+  addDataAndFileToRequest,
+  DateFieldValidation,
+  type CollectionConfig,
+  type PayloadRequest,
+} from 'payload'
+import { recalculateStatisticsForTimeWindow } from './PVProductionMonthlyStats'
+
+export const fromToValidation: DateFieldValidation = (val, { data }) => {
+  if (!data || !val) {
+    return true
+  }
+  const from = data.from as Date
+  if (!from) {
+    return true
+  }
+  if (from > val) {
+    return 'To needs to be after from'
+  }
+  if (val?.getMonth() != from.getMonth() || val?.getFullYear() != from.getFullYear()) {
+    return 'To needs to be at least within the same month and year'
+  }
+  return true
+}
 
 export const PVProductionHistory: CollectionConfig = {
   slug: 'pv_production',
@@ -29,6 +52,7 @@ export const PVProductionHistory: CollectionConfig = {
         {
           type: 'date',
           name: 'to',
+          //validate: fromToValidation,
         },
       ],
     },
@@ -85,8 +109,8 @@ export type ParsedMeasuredProductionData = {
 }
 
 export async function importPVProductionData(
-  installationId: number,
   req: PayloadRequest,
+  installationId: number,
 ): Promise<Response> {
   await addDataAndFileToRequest(req)
   if (req.json) {
@@ -159,7 +183,7 @@ export async function importPVProductionData(
     })
     await Promise.all(results)
 
-    // TODO: re-calculate monthly stats for the fiven date range
+    await recalculateStatisticsForTimeWindow(req, installationId, earliestFrom, latestTo)
 
     return Response.json({ status: 'Ok' })
   } else {

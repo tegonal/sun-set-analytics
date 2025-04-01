@@ -1,5 +1,7 @@
 import type { CollectionConfig } from 'payload'
 import { importPVProductionData } from './PVProductionHistory'
+import { recalculateStatisticsForTimeWindow } from './PVProductionMonthlyStats'
+import { parseISO } from 'date-fns'
 
 export const Installations: CollectionConfig = {
   slug: 'installations',
@@ -148,7 +150,37 @@ export const Installations: CollectionConfig = {
       path: '/:id/import-production-data',
       handler: async (req) => {
         // TODO: add authorization check
-        return importPVProductionData(req.routeParams?.id as number, req)
+
+        if (!req.routeParams?.id) {
+          return Response.json({ error: `Missing installation id in path` }, { status: 400 })
+        }
+
+        return importPVProductionData(req, req.routeParams?.id as number)
+      },
+    },
+    {
+      method: 'post',
+      path: '/:id/recalculate-monthly-stats',
+      handler: async (req) => {
+        // TODO: add authorization check
+
+        if (!req.routeParams?.id) {
+          return Response.json({ error: `Missing installation id in path` }, { status: 400 })
+        }
+
+        const fromParam = req.searchParams?.get('from')
+        if (!fromParam) {
+          return Response.json({ error: `Missing 'from' query parameter` }, { status: 400 })
+        }
+        const toParam = req.searchParams?.get('to')
+        if (!toParam) {
+          return Response.json({ error: `Missing 'to' query parameter` }, { status: 400 })
+        }
+
+        const from = parseISO(fromParam)
+        const to = parseISO(toParam)
+
+        return recalculateStatisticsForTimeWindow(req, req.routeParams?.id as number, from, to)
       },
     },
   ],
