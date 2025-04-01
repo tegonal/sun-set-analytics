@@ -68,9 +68,9 @@ export interface Config {
   blocks: {};
   collections: {
     users: User;
-    media: Media;
     installations: Installation;
     pv_production: PvProduction;
+    pv_production_monthly_stats: PvProductionMonthlyStat;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -82,9 +82,9 @@ export interface Config {
   };
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
-    media: MediaSelect<false> | MediaSelect<true>;
     installations: InstallationsSelect<false> | InstallationsSelect<true>;
     pv_production: PvProductionSelect<false> | PvProductionSelect<true>;
+    pv_production_monthly_stats: PvProductionMonthlyStatsSelect<false> | PvProductionMonthlyStatsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -175,25 +175,6 @@ export interface Installation {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "media".
- */
-export interface Media {
-  id: number;
-  alt: string;
-  updatedAt: string;
-  createdAt: string;
-  url?: string | null;
-  thumbnailURL?: string | null;
-  filename?: string | null;
-  mimeType?: string | null;
-  filesize?: number | null;
-  width?: number | null;
-  height?: number | null;
-  focalX?: number | null;
-  focalY?: number | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "pv_production".
  */
 export interface PvProduction {
@@ -202,9 +183,35 @@ export interface PvProduction {
   from?: string | null;
   to?: string | null;
   /**
-   * Produced power in kWh
+   * Energy produced in kWh
    */
-  power?: number | null;
+  energy?: number | null;
+  /**
+   * Loss of pv production data due to weather conditions as percentag (0-100%)
+   */
+  loss?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pv_production_monthly_stats".
+ */
+export interface PvProductionMonthlyStat {
+  id: number;
+  installation?: (number | null) | Installation;
+  year?: number | null;
+  month?: number | null;
+  energy?: {
+    /**
+     * measured production data kWh
+     */
+    measured_production?: number | null;
+    /**
+     * normalized production data kWh
+     */
+    normalized_production?: number | null;
+  };
   updatedAt: string;
   createdAt: string;
 }
@@ -220,16 +227,16 @@ export interface PayloadLockedDocument {
         value: number | User;
       } | null)
     | ({
-        relationTo: 'media';
-        value: number | Media;
-      } | null)
-    | ({
         relationTo: 'installations';
         value: number | Installation;
       } | null)
     | ({
         relationTo: 'pv_production';
         value: number | PvProduction;
+      } | null)
+    | ({
+        relationTo: 'pv_production_monthly_stats';
+        value: number | PvProductionMonthlyStat;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -291,24 +298,6 @@ export interface UsersSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "media_select".
- */
-export interface MediaSelect<T extends boolean = true> {
-  alt?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  url?: T;
-  thumbnailURL?: T;
-  filename?: T;
-  mimeType?: T;
-  filesize?: T;
-  width?: T;
-  height?: T;
-  focalX?: T;
-  focalY?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "installations_select".
  */
 export interface InstallationsSelect<T extends boolean = true> {
@@ -335,7 +324,25 @@ export interface PvProductionSelect<T extends boolean = true> {
   installation?: T;
   from?: T;
   to?: T;
-  power?: T;
+  energy?: T;
+  loss?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pv_production_monthly_stats_select".
+ */
+export interface PvProductionMonthlyStatsSelect<T extends boolean = true> {
+  installation?: T;
+  year?: T;
+  month?: T;
+  energy?:
+    | T
+    | {
+        measured_production?: T;
+        normalized_production?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }

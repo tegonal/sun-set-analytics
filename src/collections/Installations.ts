@@ -5,6 +5,7 @@ export const Installations: CollectionConfig = {
   slug: 'installations',
   admin: {
     useAsTitle: 'name',
+    group: 'Settings',
   },
   fields: [
     {
