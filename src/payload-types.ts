@@ -69,14 +69,22 @@ export interface Config {
   collections: {
     users: User;
     media: Media;
+    installations: Installation;
+    pv_production: PvProduction;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
   };
-  collectionsJoins: {};
+  collectionsJoins: {
+    users: {
+      installations: 'installations';
+    };
+  };
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    installations: InstallationsSelect<false> | InstallationsSelect<true>;
+    pv_production: PvProductionSelect<false> | PvProductionSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -119,6 +127,11 @@ export interface UserAuthOperations {
  */
 export interface User {
   id: number;
+  installations?: {
+    docs?: (number | Installation)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -129,6 +142,36 @@ export interface User {
   loginAttempts?: number | null;
   lockUntil?: string | null;
   password?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "installations".
+ */
+export interface Installation {
+  id: number;
+  owner: number | User;
+  name?: string | null;
+  longitude?: number | null;
+  latitude?: number | null;
+  panels?:
+    | {
+        /**
+         * This is the power that the manufacturer declares that the PV array can produce under standard test conditions, which are a constant 1000W of solar irradiance per square meter in the plane of the array, at an array temperature of 25°C. The peak power should be entered in kilowatt-peak (kWp). If you do not know the declared peak power of your modules but instead know the area of the modules (in m2) and the declared conversion efficiency (in percent), you can calculate the peak power as power (kWp) = 1 kW/m2 * area * efficiency / 100.
+         */
+        peak_power?: number | null;
+        /**
+         * This is the angle of the PV modules from the horizontal plane, for a fixed (non-tracking) mounting.
+         */
+        slope?: number | null;
+        /**
+         * The azimuth, or orientation, is the angle of the PV modules relative to the direction due South. -90° is East, 0° is South and 90° is West.
+         */
+        azimuth?: number | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -151,6 +194,22 @@ export interface Media {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pv_production".
+ */
+export interface PvProduction {
+  id: number;
+  installation?: (number | null) | Installation;
+  from?: string | null;
+  to?: string | null;
+  /**
+   * Produced power in kWh
+   */
+  power?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
@@ -163,6 +222,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'media';
         value: number | Media;
+      } | null)
+    | ({
+        relationTo: 'installations';
+        value: number | Installation;
+      } | null)
+    | ({
+        relationTo: 'pv_production';
+        value: number | PvProduction;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -211,6 +278,7 @@ export interface PayloadMigration {
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
+  installations?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -238,6 +306,38 @@ export interface MediaSelect<T extends boolean = true> {
   height?: T;
   focalX?: T;
   focalY?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "installations_select".
+ */
+export interface InstallationsSelect<T extends boolean = true> {
+  owner?: T;
+  name?: T;
+  longitude?: T;
+  latitude?: T;
+  panels?:
+    | T
+    | {
+        peak_power?: T;
+        slope?: T;
+        azimuth?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pv_production_select".
+ */
+export interface PvProductionSelect<T extends boolean = true> {
+  installation?: T;
+  from?: T;
+  to?: T;
+  power?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
