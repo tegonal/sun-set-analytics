@@ -49,9 +49,10 @@ export const PVProductionMonthlyStats: CollectionConfig = {
         },
         {
           type: 'number',
-          name: 'normalized_production',
+          name: 'expected_production',
+          required: false,
           admin: {
-            description: 'normalized production data kWh',
+            description: 'normalized expected production data kWh',
           },
         },
       ],

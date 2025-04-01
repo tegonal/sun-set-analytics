@@ -6,6 +6,7 @@ import path from 'path'
 import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
 import sharp from 'sharp'
+import { openapi, swaggerUI } from 'payload-oapi'
 
 import { Users } from './collections/Users'
 import { Installations } from './collections/Installations'
@@ -36,6 +37,14 @@ export default buildConfig({
   sharp,
   plugins: [
     payloadCloudPlugin(),
+    openapi({
+      openapiVersion: '3.0',
+      metadata: { title: 'Sunset analytics API', version: '0.0.1' },
+      enabled: true,
+    }),
+    swaggerUI({
+      enabled: true,
+    }),
     // storage-adapter-placeholder
   ],
 })

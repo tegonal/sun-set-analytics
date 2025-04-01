@@ -151,8 +151,11 @@ export interface Installation {
   id: number;
   owner: number | User;
   name?: string | null;
-  longitude?: number | null;
-  latitude?: number | null;
+  /**
+   * @minItems 2
+   * @maxItems 2
+   */
+  location?: [number, number] | null;
   panels?:
     | {
         /**
@@ -167,9 +170,19 @@ export interface Installation {
          * The azimuth, or orientation, is the angle of the PV modules relative to the direction due South. -90° is East, 0° is South and 90° is West.
          */
         azimuth?: number | null;
+        /**
+         * The estimated system losses are all the losses in the system, which cause the power actually delivered to the electricity grid to be lower than the power produced by the PV modules. There are several causes for this loss, such as losses in cables, power inverters, dirt (sometimes snow) on the modules and so on. Over the years the modules also tend to lose a bit of their power, so the average yearly output over the lifetime of the system will be a few percent lower than the output in the first years.
+         */
+        system_loss?: number | null;
         id?: string | null;
       }[]
     | null;
+  PVGIS_config?: {
+    enabled?: boolean | null;
+    radiation_database?: ('PVGIS-SARAH3' | 'PVGIS-ERA5') | null;
+    mounting_type?: ('0' | '3' | '5' | '2') | null;
+    pv_technology?: ('crystSi' | 'CIS' | 'CdTe') | null;
+  };
   updatedAt: string;
   createdAt: string;
 }
@@ -182,14 +195,20 @@ export interface PvProduction {
   installation?: (number | null) | Installation;
   from?: string | null;
   to?: string | null;
-  /**
-   * Energy produced in kWh
-   */
-  energy?: number | null;
-  /**
-   * Loss of pv production data due to weather conditions as percentag (0-100%)
-   */
-  loss?: number | null;
+  energy?: {
+    /**
+     * Energy produced in kWh
+     */
+    measured_production?: number | null;
+    /**
+     * Estimated production data in kWh for the given location and within the provided time window
+     */
+    estimated_production?: number | null;
+    /**
+     * Estimated loss of pv production data due to weather conditions as percentage (0-100%)
+     */
+    estimated_loss?: number | null;
+  };
   updatedAt: string;
   createdAt: string;
 }
@@ -208,9 +227,9 @@ export interface PvProductionMonthlyStat {
      */
     measured_production?: number | null;
     /**
-     * normalized production data kWh
+     * normalized expected production data kWh
      */
-    normalized_production?: number | null;
+    expected_production?: number | null;
   };
   updatedAt: string;
   createdAt: string;
@@ -303,15 +322,23 @@ export interface UsersSelect<T extends boolean = true> {
 export interface InstallationsSelect<T extends boolean = true> {
   owner?: T;
   name?: T;
-  longitude?: T;
-  latitude?: T;
+  location?: T;
   panels?:
     | T
     | {
         peak_power?: T;
         slope?: T;
         azimuth?: T;
+        system_loss?: T;
         id?: T;
+      };
+  PVGIS_config?:
+    | T
+    | {
+        enabled?: T;
+        radiation_database?: T;
+        mounting_type?: T;
+        pv_technology?: T;
       };
   updatedAt?: T;
   createdAt?: T;
@@ -324,8 +351,13 @@ export interface PvProductionSelect<T extends boolean = true> {
   installation?: T;
   from?: T;
   to?: T;
-  energy?: T;
-  loss?: T;
+  energy?:
+    | T
+    | {
+        measured_production?: T;
+        estimated_production?: T;
+        estimated_loss?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }
@@ -341,7 +373,7 @@ export interface PvProductionMonthlyStatsSelect<T extends boolean = true> {
     | T
     | {
         measured_production?: T;
-        normalized_production?: T;
+        expected_production?: T;
       };
   updatedAt?: T;
   createdAt?: T;
