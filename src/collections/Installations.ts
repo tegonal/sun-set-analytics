@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { importPVProductionData } from './PVProductionHistory'
 
 export const Installations: CollectionConfig = {
   slug: 'installations',
@@ -59,6 +60,16 @@ export const Installations: CollectionConfig = {
           },
         },
       ],
+    },
+  ],
+  endpoints: [
+    {
+      method: 'post',
+      path: '/:id/import-production-data',
+      handler: async (req) => {
+        // TODO: add authorization check
+        return importPVProductionData(req.routeParams?.id as number, req)
+      },
     },
   ],
 }

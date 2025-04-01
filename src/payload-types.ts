@@ -151,8 +151,11 @@ export interface Installation {
   id: number;
   owner: number | User;
   name?: string | null;
-  longitude?: number | null;
-  latitude?: number | null;
+  /**
+   * @minItems 2
+   * @maxItems 2
+   */
+  location?: [number, number] | null;
   panels?:
     | {
         /**
@@ -192,7 +195,7 @@ export interface PvProduction {
      */
     estimated_max_production?: number | null;
     /**
-     * Estimated loss of pv production data due to weather conditions as percentag (0-100%)
+     * Estimated loss of pv production data due to weather conditions as percentage (0-100%)
      */
     estimated_loss?: number | null;
   };
@@ -214,9 +217,9 @@ export interface PvProductionMonthlyStat {
      */
     measured_production?: number | null;
     /**
-     * normalized production data kWh
+     * normalized expected production data kWh
      */
-    normalized_production?: number | null;
+    expected_production?: number | null;
   };
   updatedAt: string;
   createdAt: string;
@@ -309,8 +312,7 @@ export interface UsersSelect<T extends boolean = true> {
 export interface InstallationsSelect<T extends boolean = true> {
   owner?: T;
   name?: T;
-  longitude?: T;
-  latitude?: T;
+  location?: T;
   panels?:
     | T
     | {
@@ -352,7 +354,7 @@ export interface PvProductionMonthlyStatsSelect<T extends boolean = true> {
     | T
     | {
         measured_production?: T;
-        normalized_production?: T;
+        expected_production?: T;
       };
   updatedAt?: T;
   createdAt?: T;
