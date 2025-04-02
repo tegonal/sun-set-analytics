@@ -1,4 +1,4 @@
-import type { CollectionConfig } from 'payload'
+import type { Collection, CollectionConfig, User } from 'payload'
 import { importPVProductionData } from './PVProductionHistory'
 import { recalculateStatisticsForTimeWindow } from './PVProductionMonthlyStats'
 import { parseISO } from 'date-fns'
@@ -15,7 +15,6 @@ export const Installations: CollectionConfig = {
     create: isOwner,
     update: isOwner,
     delete: isOwner,
-
   },
   fields: [
     {
@@ -29,6 +28,8 @@ export const Installations: CollectionConfig = {
     {
       type: 'text',
       name: 'name',
+      unique: true,
+      required: true,
     },
     {
       type: 'point',
@@ -157,20 +158,41 @@ export const Installations: CollectionConfig = {
       method: 'post',
       path: '/:id/import-production-data',
       handler: async (req) => {
-        // TODO: add authorization check
-
         if (!req.routeParams?.id) {
           return Response.json({ error: `Missing installation id in path` }, { status: 400 })
         }
+        if (!req.user?.id) {
+          return Response.json({ error: `Missing user in the request` }, { status: 400 })
+        }
 
-        return importPVProductionData(req, req.routeParams?.id as number)
+        const user = await req.payload.findByID({
+          collection: 'users',
+          id: req.user?.id as number,
+        })
+        const installation = await req.payload.findByID({
+          collection: 'installations',
+          id: req.routeParams?.id as number,
+        })
+
+        if (typeof installation.owner !== 'number' && installation.owner.id === user.id) {
+          return importPVProductionData(req, req.routeParams?.id as number)
+        } else {
+          return Response.json({ error: 'You have no permission' }, { status: 403 })
+        }
       },
     },
     {
       method: 'post',
       path: '/:id/recalculate-monthly-stats',
       handler: async (req) => {
-        // TODO: add authorization check
+        const user = await req.payload.findByID({
+          collection: 'users',
+          id: req.user?.id as number,
+        })
+        const installation = await req.payload.findByID({
+          collection: 'installations',
+          id: req.routeParams?.id as number,
+        })
 
         if (!req.routeParams?.id) {
           return Response.json({ error: `Missing installation id in path` }, { status: 400 })
@@ -188,7 +210,11 @@ export const Installations: CollectionConfig = {
         const from = parseISO(fromParam)
         const to = parseISO(toParam)
 
-        return recalculateStatisticsForTimeWindow(req, req.routeParams?.id as number, from, to)
+        if (typeof installation.owner !== 'number' && installation.owner.id === user.id) {
+          return recalculateStatisticsForTimeWindow(req, req.routeParams?.id as number, from, to)
+        } else {
+          return Response.json({ error: 'You have no permission' }, { status: 403 })
+        }
       },
     },
   ],

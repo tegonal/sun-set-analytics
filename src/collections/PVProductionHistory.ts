@@ -47,14 +47,6 @@ export const PVProductionHistory: CollectionConfig = {
   },
   fields: [
     {
-      name: 'owner',
-      type: 'relationship',
-      relationTo: 'users',
-      hasMany: false,
-      required: true,
-      index: true,
-    },
-    {
       type: 'relationship',
       name: 'installation',
       hasMany: false,
