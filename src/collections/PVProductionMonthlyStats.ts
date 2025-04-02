@@ -1,5 +1,5 @@
 import type { CollectionConfig } from 'payload'
-import { whereOwnerOrAdmin, whereAdmin } from '@/access/whereOwnerOrAdmin'
+import { isOwner } from '@/access/whereOwnerOrAdmin'
 
 export const PVProductionMonthlyStats: CollectionConfig = {
   slug: 'pv_production_monthly_stats',
@@ -12,10 +12,10 @@ export const PVProductionMonthlyStats: CollectionConfig = {
     hidden: true,
   },
   access: {
-    read: whereOwnerOrAdmin, 
-    create: whereOwnerOrAdmin, 
-    update: whereOwnerOrAdmin, 
-    delete: whereOwnerOrAdmin, 
+    read: isOwner,
+    create: isOwner,
+    update: isOwner,
+    delete: isOwner,
   },
   fields: [
     {
@@ -63,6 +63,21 @@ export const PVProductionMonthlyStats: CollectionConfig = {
           },
         },
       ],
+    },{
+      name: 'owner',
+      type: 'relationship',
+      relationTo: 'users',
+      hasMany: false,
+      required: true,
+      index: true,
+    },
+    {
+      name: 'owner',
+      type: 'relationship',
+      relationTo: 'users',
+      hasMany: false,
+      required: true,
+      index: true,
     },
   ],
 }

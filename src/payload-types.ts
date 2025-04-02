@@ -64,6 +64,7 @@ export type SupportedTimezones =
 export interface Config {
   auth: {
     users: UserAuthOperations;
+    pv_production: PvProductionAuthOperations;
   };
   blocks: {};
   collections: {
@@ -95,15 +96,37 @@ export interface Config {
   globals: {};
   globalsSelect: {};
   locale: null;
-  user: User & {
-    collection: 'users';
-  };
+  user:
+    | (User & {
+        collection: 'users';
+      })
+    | (PvProduction & {
+        collection: 'pv_production';
+      });
   jobs: {
     tasks: unknown;
     workflows: unknown;
   };
 }
 export interface UserAuthOperations {
+  forgotPassword: {
+    email: string;
+    password: string;
+  };
+  login: {
+    email: string;
+    password: string;
+  };
+  registerFirstUser: {
+    email: string;
+    password: string;
+  };
+  unlock: {
+    email: string;
+    password: string;
+  };
+}
+export interface PvProductionAuthOperations {
   forgotPassword: {
     email: string;
     password: string;
@@ -135,6 +158,9 @@ export interface User {
   role?: ('admin' | 'user') | null;
   updatedAt: string;
   createdAt: string;
+  enableAPIKey?: boolean | null;
+  apiKey?: string | null;
+  apiKeyIndex?: string | null;
   email: string;
   resetPasswordToken?: string | null;
   resetPasswordExpiration?: string | null;
@@ -193,6 +219,7 @@ export interface Installation {
  */
 export interface PvProduction {
   id: number;
+  owner: number | User;
   installation?: (number | null) | Installation;
   from?: string | null;
   to?: string | null;
@@ -212,6 +239,17 @@ export interface PvProduction {
   };
   updatedAt: string;
   createdAt: string;
+  enableAPIKey?: boolean | null;
+  apiKey?: string | null;
+  apiKeyIndex?: string | null;
+  email: string;
+  resetPasswordToken?: string | null;
+  resetPasswordExpiration?: string | null;
+  salt?: string | null;
+  hash?: string | null;
+  loginAttempts?: number | null;
+  lockUntil?: string | null;
+  password?: string | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -232,6 +270,7 @@ export interface PvProductionMonthlyStat {
      */
     expected_production?: number | null;
   };
+  owner: number | User;
   updatedAt: string;
   createdAt: string;
 }
@@ -259,10 +298,15 @@ export interface PayloadLockedDocument {
         value: number | PvProductionMonthlyStat;
       } | null);
   globalSlug?: string | null;
-  user: {
-    relationTo: 'users';
-    value: number | User;
-  };
+  user:
+    | {
+        relationTo: 'users';
+        value: number | User;
+      }
+    | {
+        relationTo: 'pv_production';
+        value: number | PvProduction;
+      };
   updatedAt: string;
   createdAt: string;
 }
@@ -272,10 +316,15 @@ export interface PayloadLockedDocument {
  */
 export interface PayloadPreference {
   id: number;
-  user: {
-    relationTo: 'users';
-    value: number | User;
-  };
+  user:
+    | {
+        relationTo: 'users';
+        value: number | User;
+      }
+    | {
+        relationTo: 'pv_production';
+        value: number | PvProduction;
+      };
   key?: string | null;
   value?:
     | {
@@ -309,6 +358,9 @@ export interface UsersSelect<T extends boolean = true> {
   role?: T;
   updatedAt?: T;
   createdAt?: T;
+  enableAPIKey?: T;
+  apiKey?: T;
+  apiKeyIndex?: T;
   email?: T;
   resetPasswordToken?: T;
   resetPasswordExpiration?: T;
@@ -350,6 +402,7 @@ export interface InstallationsSelect<T extends boolean = true> {
  * via the `definition` "pv_production_select".
  */
 export interface PvProductionSelect<T extends boolean = true> {
+  owner?: T;
   installation?: T;
   from?: T;
   to?: T;
@@ -362,6 +415,16 @@ export interface PvProductionSelect<T extends boolean = true> {
       };
   updatedAt?: T;
   createdAt?: T;
+  enableAPIKey?: T;
+  apiKey?: T;
+  apiKeyIndex?: T;
+  email?: T;
+  resetPasswordToken?: T;
+  resetPasswordExpiration?: T;
+  salt?: T;
+  hash?: T;
+  loginAttempts?: T;
+  lockUntil?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -377,6 +440,7 @@ export interface PvProductionMonthlyStatsSelect<T extends boolean = true> {
         measured_production?: T;
         expected_production?: T;
       };
+  owner?: T;
   updatedAt?: T;
   createdAt?: T;
 }

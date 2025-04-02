@@ -1,18 +1,18 @@
-import {Access} from 'payload'
-import { ROLE_SUPER_ADMIN} from '@/utilities/constants'
 
-export const whereOwnerOrAdmin = ({ req, doc }) => {
-  if (req.user?.role === ROLE_SUPER_ADMIN) {
-    return true;
+import { Access } from 'payload'
+import { ROLE_SUPER_ADMIN } from '@/utilities/constants'
+
+export const isOwner = ({ req: { user } }) => {
+  return {
+    owner: {
+      equals: user?.id,
+    },
   }
+}
 
-  return doc?.owner?.id === req.user?.id;
-};
-
-export const whereAdmin = ({ req, doc }) => {
-  if (req.user?.role === ROLE_SUPER_ADMIN) {
-    return true;
+export const isAdmin = ({ req: { user } }) => {
+  if (user?.role === ROLE_SUPER_ADMIN) {
+    return true
   }
-
-  return false;
+  return false
 }
