@@ -1,5 +1,6 @@
 import { and, eq, gte, lte, sql } from '@payloadcms/db-sqlite/drizzle'
 import type { CollectionConfig, PayloadRequest } from 'payload'
+import { isOwner } from '@/access/whereOwnerOrAdmin'
 
 export const PVProductionMonthlyStats: CollectionConfig = {
   slug: 'pv_production_monthly_stats',
@@ -11,6 +12,12 @@ export const PVProductionMonthlyStats: CollectionConfig = {
     group: 'Statistics',
     // mark as hidden after testing or in production mode
     hidden: false,
+  },
+  access: {
+    read: isOwner,
+    create: isOwner,
+    update: isOwner,
+    delete: isOwner,
   },
   fields: [
     {
@@ -58,6 +65,21 @@ export const PVProductionMonthlyStats: CollectionConfig = {
           },
         },
       ],
+    },{
+      name: 'owner',
+      type: 'relationship',
+      relationTo: 'users',
+      hasMany: false,
+      required: true,
+      index: true,
+    },
+    {
+      name: 'owner',
+      type: 'relationship',
+      relationTo: 'users',
+      hasMany: false,
+      required: true,
+      index: true,
     },
   ],
 }

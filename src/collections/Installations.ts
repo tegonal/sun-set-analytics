@@ -2,12 +2,20 @@ import type { CollectionConfig } from 'payload'
 import { importPVProductionData } from './PVProductionHistory'
 import { recalculateStatisticsForTimeWindow } from './PVProductionMonthlyStats'
 import { parseISO } from 'date-fns'
+import { isOwner } from '@/access/whereOwnerOrAdmin'
 
 export const Installations: CollectionConfig = {
   slug: 'installations',
   admin: {
     useAsTitle: 'name',
     group: 'Settings',
+  },
+  access: {
+    read: isOwner,
+    create: isOwner,
+    update: isOwner,
+    delete: isOwner,
+
   },
   fields: [
     {

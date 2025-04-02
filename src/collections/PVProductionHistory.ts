@@ -8,6 +8,7 @@ import {
   type PayloadRequest,
 } from 'payload'
 import { recalculateStatisticsForTimeWindow } from './PVProductionMonthlyStats'
+import { isOwner } from '@/access/whereOwnerOrAdmin'
 
 export const fromToValidation: DateFieldValidation = (val, { data }) => {
   if (!data || !val) {
@@ -32,10 +33,27 @@ export const PVProductionHistory: CollectionConfig = {
     singular: 'PV production history entry',
     plural: 'PV production history entries',
   },
+  auth: {
+    useAPIKey: true,
+  },
   admin: {
     group: 'Solar data',
   },
+  access: {
+    read: isOwner,
+    create: isOwner,
+    update: isOwner,
+    delete: isOwner,
+  },
   fields: [
+    {
+      name: 'owner',
+      type: 'relationship',
+      relationTo: 'users',
+      hasMany: false,
+      required: true,
+      index: true,
+    },
     {
       type: 'relationship',
       name: 'installation',
