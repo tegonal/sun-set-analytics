@@ -2,7 +2,7 @@ import { Installation, PvProduction } from '@/payload-types'
 import { addHours, parse } from 'date-fns'
 import ky from 'ky'
 import { addDataAndFileToRequest, type CollectionConfig, type PayloadRequest } from 'payload'
-import { whereOwnerOrAdmin, whereAdmin } from '@/access/whereOwnerOrAdmin'
+import { isOwner } from '@/access/whereOwnerOrAdmin'
 
 export const PVProductionHistory: CollectionConfig = {
   slug: 'pv_production',
@@ -10,14 +10,17 @@ export const PVProductionHistory: CollectionConfig = {
     singular: 'PV production history entry',
     plural: 'PV production history entries',
   },
+  auth: {
+    useAPIKey: true,
+  },
   admin: {
     group: 'Solar data',
   },
   access: {
-    read: whereOwnerOrAdmin, 
-    create: whereOwnerOrAdmin, 
-    update: whereOwnerOrAdmin, 
-    delete: whereOwnerOrAdmin, 
+    read: isOwner,
+    create: isOwner,
+    update: isOwner,
+    delete: isOwner,
   },
   fields: [
     {

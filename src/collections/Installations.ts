@@ -1,6 +1,6 @@
 import type { CollectionConfig } from 'payload'
 import { importPVProductionData } from './PVProductionHistory'
-import { whereOwnerOrAdmin, whereAdmin } from '@/access/whereOwnerOrAdmin'
+import { isOwner } from '@/access/whereOwnerOrAdmin'
 
 export const Installations: CollectionConfig = {
   slug: 'installations',
@@ -9,10 +9,10 @@ export const Installations: CollectionConfig = {
     group: 'Settings',
   },
   access: {
-    read: whereOwnerOrAdmin, 
-    create: whereOwnerOrAdmin, 
-    update: whereOwnerOrAdmin, 
-    delete: whereOwnerOrAdmin, 
+    read: isOwner,
+    create: isOwner,
+    update: isOwner,
+    delete: isOwner,
   },
   fields: [
     {

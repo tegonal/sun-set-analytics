@@ -1,6 +1,6 @@
 import type { CollectionConfig } from 'payload'
 import { ROLE_SUPER_ADMIN, ROLE_USER } from '@/utilities/constants'
-import { whereAdmin } from '@/access/whereOwnerOrAdmin'
+import { isAdmin } from '@/access/whereOwnerOrAdmin'
 
 export const Users: CollectionConfig = {
   slug: 'users',
@@ -9,12 +9,14 @@ export const Users: CollectionConfig = {
     group: 'Settings',
   },
   access: {
-    read: whereAdmin, 
-    create: whereAdmin, 
-    update: whereAdmin, 
-    delete: whereAdmin,
+    read: () => true,
+    create: isAdmin,
+    update: isAdmin,
+    delete: isAdmin,
   },
-  auth: true,
+  auth: {
+    useAPIKey: true,
+  },
   fields: [
     // Email added by default
     // Add more fields as needed
@@ -23,7 +25,8 @@ export const Users: CollectionConfig = {
       name: 'installations',
       collection: 'installations',
       on: 'owner',
-    },    {
+    },
+    {
       type: 'select',
       name: 'role',
       defaultValue: ROLE_USER,
@@ -37,6 +40,6 @@ export const Users: CollectionConfig = {
           value: ROLE_USER,
         },
       ],
-    }
+    },
   ],
 }
