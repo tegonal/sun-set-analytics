@@ -22,7 +22,7 @@ body,
 
 body {
   font-family: system-ui;
-  font-size: 18px;
+  font-size: 16px;
   line-height: 32px;
 
   margin: 0;
@@ -114,6 +114,11 @@ svg {
     h1 {
       text-align: center;
     }
+  }
+
+  .plot {
+    background: rgb(240, 240, 240);
+    color: rgb(0, 0, 0);
   }
 
   .links {
