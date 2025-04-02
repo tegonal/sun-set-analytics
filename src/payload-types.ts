@@ -266,9 +266,9 @@ export interface PvProductionMonthlyStat {
      */
     measured_production?: number | null;
     /**
-     * normalized expected production data kWh
+     * normalized estimated production data kWh
      */
-    expected_production?: number | null;
+    estimated_production?: number | null;
   };
   owner: number | User;
   updatedAt: string;
@@ -438,7 +438,7 @@ export interface PvProductionMonthlyStatsSelect<T extends boolean = true> {
     | T
     | {
         measured_production?: T;
-        expected_production?: T;
+        estimated_production?: T;
       };
   owner?: T;
   updatedAt?: T;

@@ -1,9 +1,31 @@
 import { Installation, PvProduction } from '@/payload-types'
 import { addHours, parse } from 'date-fns'
 import ky from 'ky'
-import { addDataAndFileToRequest, type CollectionConfig, type PayloadRequest } from 'payload'
+import {
+  addDataAndFileToRequest,
+  DateFieldValidation,
+  type CollectionConfig,
+  type PayloadRequest,
+} from 'payload'
+import { recalculateStatisticsForTimeWindow } from './PVProductionMonthlyStats'
 import { isOwner } from '@/access/whereOwnerOrAdmin'
 
+export const fromToValidation: DateFieldValidation = (val, { data }) => {
+  if (!data || !val) {
+    return true
+  }
+  const from = data.from as Date
+  if (!from) {
+    return true
+  }
+  if (from > val) {
+    return 'To needs to be after from'
+  }
+  if (val?.getMonth() != from.getMonth() || val?.getFullYear() != from.getFullYear()) {
+    return 'To needs to be at least within the same month and year'
+  }
+  return true
+}
 
 export const PVProductionHistory: CollectionConfig = {
   slug: 'pv_production',
@@ -44,10 +66,21 @@ export const PVProductionHistory: CollectionConfig = {
         {
           type: 'date',
           name: 'from',
+          admin: {
+            date: {
+              pickerAppearance: 'dayAndTime',
+            },
+          },
         },
         {
           type: 'date',
           name: 'to',
+          admin: {
+            date: {
+              pickerAppearance: 'dayAndTime',
+            },
+          },
+          //validate: fromToValidation,
         },
       ],
     },
@@ -103,11 +136,21 @@ export type ParsedMeasuredProductionData = {
   production: number
 }
 
+function chunks<T>(arr: T[], chunkSize: number) {
+  const chunks: T[][] = []
+  while (arr.length > 0) {
+    const chunk = arr.splice(0, chunkSize)
+    chunks.push(chunk)
+  }
+  return chunks
+}
+
 export async function importPVProductionData(
-  installationId: number,
   req: PayloadRequest,
+  installationId: number,
 ): Promise<Response> {
   await addDataAndFileToRequest(req)
+  const pv_production_history = req.payload.db.tables['pv_production']
   if (req.json) {
     console.debug('import data for installation', installationId)
     const data: PVProductionImport = await req.json()
@@ -152,33 +195,41 @@ export async function importPVProductionData(
       ? await fetchPVGISData(earliestFrom, latestTo, installation)
       : undefined
 
-    const results = parseEntries.map(async (row) => {
-      const estimated_production = pvgisData
-        ? // determine measure value
-          calculateEstimatedProductionForTimeWindow(row.from.getTime(), row.to.getTime(), pvgisData)
-        : undefined
+    // insert importe data in chunks
+    const batchSize = 100
+    const inputChunks = chunks(parseEntries, batchSize)
+    console.debug('Prepared chunks')
+    await req.payload.db.drizzle.transaction(async (tx) => {
+      const futures = inputChunks.map(async (elements) => {
+        const importData = elements.map((row) => {
+          const estimated_production = pvgisData
+            ? // determine measure value
+              calculateEstimatedProductionForTimeWindow(
+                row.from.getTime(),
+                row.to.getTime(),
+                pvgisData,
+              )
+            : undefined
 
-      const data: Omit<PvProduction, 'id' | 'createdAt' | 'updatedAt'> = {
-        installation: installation,
-        from: row.from.toISOString(),
-        to: row.to.toISOString(),
-        energy: {
-          measured_production: row.production,
-          estimated_production: estimated_production,
-        },
-      }
+          const data = {
+            id: null,
+            installation: installationId,
+            from: row.from.toISOString(),
+            to: row.to.toISOString(),
+            energy_measured_production: row.production,
+            energy_estimated_production: estimated_production,
+          }
 
-      console.debug('import row', data)
-
-      await req.payload.create({
-        req,
-        collection: 'pv_production',
-        data: data,
+          return data
+        })
+        process.stdout.write('.')
+        return await tx.insert(pv_production_history).values(importData)
       })
+      return await Promise.all(futures)
     })
-    await Promise.all(results)
+    process.stdout.write('\n')
 
-    // TODO: re-calculate monthly stats for the fiven date range
+    await recalculateStatisticsForTimeWindow(req, installationId, earliestFrom, latestTo)
 
     return Response.json({ status: 'Ok' })
   } else {
@@ -195,24 +246,24 @@ export async function importPVProductionData(
 function calculateEstimatedProductionForTimeWindow(
   from: number,
   to: number,
-  pvgis: PVGISResult,
+  pvgis: PVGISParsedOutput[],
 ): number | undefined {
-  const fetchedValues = pvgis.outputs.hourly
+  const fetchedValues = pvgis
     .map((value) => {
-      // expected time format i.e.: '20170101:0010'
-      const date = parse(value.time, 'yyyyMMdd:HHmm', new Date())
-      const startTime = date.getTime()
-      const endTime = addHours(date, 1).getTime()
-
-      if (startTime >= from && endTime <= to) {
+      if (value.startTime >= from && value.endTime <= to) {
         // sum all hourly values full included in the time window
         // convert from W to kW
         return value.P / 1000
       }
-      if ((from >= startTime && from <= endTime) || (to >= startTime && to <= endTime)) {
+      if (
+        (from >= value.startTime && from <= value.endTime) ||
+        (to >= value.startTime && to <= value.endTime)
+      ) {
         // partially included in the time window, calculate proportional value
         // convert from W to kW
-        const factor = (Math.min(to, endTime) - Math.max(from, startTime)) / (endTime - startTime)
+        const factor =
+          (Math.min(to, value.endTime) - Math.max(from, value.startTime)) /
+          (value.endTime - value.startTime)
         return (value.P * factor) / 1000
       }
       // no part of the time window
@@ -231,7 +282,7 @@ async function fetchPVGISData(
   from: Date,
   to: Date,
   installation: Installation,
-): Promise<PVGISResult | undefined> {
+): Promise<PVGISParsedOutput[] | undefined> {
   if (to.getFullYear() < 2005 || from.getFullYear() > 2023) {
     // cannot fetch data outside of the available time window
     return Promise.resolve(undefined)
@@ -276,15 +327,29 @@ async function fetchPVGISData(
       })
       .json<PVGISResult>()
   })
+  console.debug('fetched PVGIS data')
   const parsedResults: PVGISResult[] = await Promise.all(results)
   if (!parsedResults) {
     return undefined
   }
+
+  const enrich = (result: PVGISResult) => {
+    return result.outputs.hourly.map((entry) => {
+      // expected time format i.e.: '20170101:0010'
+      const date = parse(entry.time, 'yyyyMMdd:HHmm', new Date())
+      return {
+        startTime: date.getTime(),
+        endTime: addHours(date, 1).getTime(),
+        P: entry.P,
+      }
+    })
+  }
+
   if (parsedResults.length === 1) {
-    return parsedResults[0]
+    return enrich(parsedResults[0])
   }
   // merge results, expect the same number of records
-  parsedResults.reduce((a, b) => {
+  const mergedResult = parsedResults.reduce((a, b) => {
     if (a.outputs.hourly.length != b.outputs.hourly.length) {
       console.error('expected same number of results')
       return a
@@ -296,6 +361,7 @@ async function fetchPVGISData(
       }
     }
   })
+  return enrich(mergedResult)
 }
 
 interface PVGISResult {
@@ -307,4 +373,11 @@ interface PVGISResult {
 interface PVGISOutput {
   time: string
   P: number
+}
+
+interface PVGISParsedOutput {
+  P: number
+  // enriched information
+  startTime: number
+  endTime: number
 }
