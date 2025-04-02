@@ -1,5 +1,5 @@
 import { Installation } from '@/payload-types'
-import { EstimatedProductionProviderService, ProductionData } from '..'
+import { EstimatedProductionProviderService, HourlyProductionData, ProductionData } from '..'
 import ky from 'ky'
 import { addHours, parse } from 'date-fns'
 
@@ -8,7 +8,7 @@ export class PVGISProductionProviderService implements EstimatedProductionProvid
     installation: Installation,
     from: Date,
     to: Date,
-  ): Promise<ProductionData | undefined> {
+  ): Promise<HourlyProductionData | undefined> {
     if (
       !installation.PVGIS_config?.enabled ||
       to.getFullYear() < 2005 ||
@@ -24,6 +24,7 @@ export class PVGISProductionProviderService implements EstimatedProductionProvid
 
     // fetch for all panels
     const results = (installation.panels || []).map(async (panel) => {
+      // https://joint-research-centre.ec.europa.eu/photovoltaic-geographical-information-system-pvgis/getting-started-pvgis/pvgis-user-manual_en
       return await ky
         .get('https://re.jrc.ec.europa.eu/api/v5_3/seriescalc', {
           headers: {
@@ -64,14 +65,14 @@ export class PVGISProductionProviderService implements EstimatedProductionProvid
     }
 
     const enrich = (result: PVGISResult) => {
-      return new PVGISProductionData(
+      return new HourlyProductionData(
         result.outputs.hourly.map((entry) => {
           // expected time format i.e.: '20170101:0010'
           const date = parse(entry.time, 'yyyyMMdd:HHmm', new Date())
           return {
             startTime: date.getTime(),
             endTime: addHours(date, 1).getTime(),
-            P: entry.P,
+            value_watts_per_hour: entry.P,
           }
         }),
       )
@@ -88,7 +89,12 @@ export class PVGISProductionProviderService implements EstimatedProductionProvid
       } else {
         return {
           outputs: {
-            hourly: a.outputs.hourly.map((item, i) => Object.assign({}, item, b.outputs.hourly[i])),
+            hourly: a.outputs.hourly.map((item, i) => {
+              return {
+                time: item.time,
+                P: item.P + b.outputs.hourly[i].P,
+              }
+            }),
           },
         }
       }
@@ -96,44 +102,11 @@ export class PVGISProductionProviderService implements EstimatedProductionProvid
     return enrich(mergedResult)
   }
 }
-
-class PVGISProductionData implements ProductionData {
-  pvgis: PVGISParsedOutput[]
-  constructor(pvgis: PVGISParsedOutput[]) {
-    this.pvgis = pvgis
-  }
-  async calculateForDateRange(from: Date, to: Date): Promise<number | undefined> {
-    const fromTime = from.getTime()
-    const toTime = to.getTime()
-    const fetchedValues = this.pvgis
-      .map((value) => {
-        if (value.startTime >= fromTime && value.endTime <= toTime) {
-          // sum all hourly values full included in the time window
-          // convert from W to kW
-          return value.P / 1000
-        }
-        if (
-          (fromTime >= value.startTime && fromTime <= value.endTime) ||
-          (toTime >= value.startTime && toTime <= value.endTime)
-        ) {
-          // partially included in the time window, calculate proportional value
-          // convert from W to kW
-          const factor =
-            (Math.min(toTime, value.endTime) - Math.max(fromTime, value.startTime)) /
-            (value.endTime - value.startTime)
-          return (value.P * factor) / 1000
-        }
-        // no part of the time window
-        return undefined
-      })
-      .filter((a) => a)
-
-    if (fetchedValues.length > 0) {
-      return fetchedValues.reduce((a, b) => a! + b!)
-    }
-    // no valid values found
-    return undefined
-  }
+interface PVGISParsedOutput {
+  P: number
+  // enriched information
+  startTime: number
+  endTime: number
 }
 
 interface PVGISResult {
@@ -145,11 +118,4 @@ interface PVGISResult {
 interface PVGISOutput {
   time: string
   P: number
-}
-
-interface PVGISParsedOutput {
-  P: number
-  // enriched information
-  startTime: number
-  endTime: number
 }

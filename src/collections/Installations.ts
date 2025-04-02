@@ -1,5 +1,8 @@
-import type { Collection, CollectionConfig, User } from 'payload'
-import { importPVProductionData } from './PVProductionHistory'
+import type { CollectionConfig } from 'payload'
+import {
+  importPVProductionData,
+  recalculateEstimatedProductionForTimeWindow,
+} from './PVProductionHistory'
 import { recalculateStatisticsForTimeWindow } from './PVProductionMonthlyStats'
 import { parseISO } from 'date-fns'
 import { isOwner } from '@/access/whereOwnerOrAdmin'
@@ -215,6 +218,36 @@ export const Installations: CollectionConfig = {
         } else {
           return Response.json({ error: 'You have no permission' }, { status: 403 })
         }
+      },
+    },
+    {
+      method: 'post',
+      path: '/:id/recalculate-estimated-production',
+      handler: async (req) => {
+        // TODO: add authorization check
+
+        if (!req.routeParams?.id) {
+          return Response.json({ error: `Missing installation id in path` }, { status: 400 })
+        }
+
+        const fromParam = req.searchParams?.get('from')
+        if (!fromParam) {
+          return Response.json({ error: `Missing 'from' query parameter` }, { status: 400 })
+        }
+        const toParam = req.searchParams?.get('to')
+        if (!toParam) {
+          return Response.json({ error: `Missing 'to' query parameter` }, { status: 400 })
+        }
+
+        const from = parseISO(fromParam)
+        const to = parseISO(toParam)
+
+        return recalculateEstimatedProductionForTimeWindow(
+          req,
+          req.routeParams?.id as number,
+          from,
+          to,
+        )
       },
     },
   ],

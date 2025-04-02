@@ -8,6 +8,9 @@ import { recalculateStatisticsForTimeWindow } from './PVProductionMonthlyStats'
 import { isOwner } from '@/access/whereOwnerOrAdmin'
 import { PVGISProductionProviderService } from '@/services/integrations/pvgis'
 import { ProductionData } from '@/services/integrations'
+import { OpenMeteoProductionProviderService } from '@/services/integrations/open_meteo'
+import { parseISO } from 'date-fns'
+import { eq } from '@payloadcms/db-sqlite/drizzle'
 
 export const fromToValidation: DateFieldValidation = (val, { data }) => {
   if (!data || !val) {
@@ -133,7 +136,11 @@ function chunks<T>(arr: T[], chunkSize: number) {
   return chunks
 }
 
-const PRODUCTION_PROVIDER_SERVICES = [new PVGISProductionProviderService()]
+// available production provider services, in order of importanve/priority
+const PRODUCTION_PROVIDER_SERVICES = [
+  new PVGISProductionProviderService(),
+  new OpenMeteoProductionProviderService(),
+]
 
 const foldl = <A, B>(f: (x: A, acc: B) => B, acc: B, [h, ...t]: A[]): B =>
   h === undefined ? acc : foldl(f, f(h, acc), t)
@@ -179,6 +186,7 @@ export async function importPVProductionData(
     const latestTo = parseEntries.map((x) => x.to).sort((a, b) => b.getTime() - a.getTime())[0]
 
     const installation = await req.payload.findByID({
+      req,
       id: installationId,
       collection: 'installations',
     })
@@ -197,28 +205,30 @@ export async function importPVProductionData(
     console.debug('Prepared chunks')
     await req.payload.db.drizzle.transaction(async (tx) => {
       const futures = inputChunks.map(async (elements) => {
-        const importData = elements.map((row) => {
-          // finrst estimation by iterating through providers until
-          const estimated_production = foldl<ProductionData, Promise<number | undefined>>(
-            async (service, result) =>
-              (await result)
-                ? Promise.resolve(result)
-                : await service.calculateForDateRange(row.from, row.to),
-            Promise.resolve(undefined),
-            productionDataProviders,
-          )
+        const importData = await Promise.all(
+          elements.map(async (row) => {
+            // first estimation by iterating through providers until
+            const estimated_production = await foldl<ProductionData, Promise<number | undefined>>(
+              async (service, result) =>
+                (await result)
+                  ? Promise.resolve(result)
+                  : await service.calculateForDateRange(row.from, row.to),
+              Promise.resolve(undefined),
+              productionDataProviders,
+            )
 
-          const data = {
-            id: null,
-            installation: installationId,
-            from: row.from.toISOString(),
-            to: row.to.toISOString(),
-            energy_measured_production: row.production,
-            energy_estimated_production: estimated_production,
-          }
+            const data = {
+              id: null,
+              installation: installationId,
+              from: row.from.toISOString(),
+              to: row.to.toISOString(),
+              energy_measured_production: row.production,
+              energy_estimated_production: estimated_production,
+            }
 
-          return data
-        })
+            return data
+          }),
+        )
         process.stdout.write('.')
         return await tx.insert(pv_production_history).values(importData)
       })
@@ -232,4 +242,67 @@ export async function importPVProductionData(
   } else {
     return Response.error()
   }
+}
+
+export async function recalculateEstimatedProductionForTimeWindow(
+  req: PayloadRequest,
+  installationId: number,
+  from: Date,
+  to: Date,
+): Promise<Response> {
+  const installation = await req.payload.findByID({
+    req,
+    id: installationId,
+    collection: 'installations',
+  })
+  const pv_production_history = req.payload.db.tables['pv_production']
+
+  const productionDataProviders = (
+    await Promise.all(
+      PRODUCTION_PROVIDER_SERVICES.map(
+        async (p) => await p.fetchEstimatedProductionData(installation, from, to),
+      ),
+    )
+  ).filter((p) => p !== undefined)
+
+  // fetch pv production data from database
+  const currentData = await req.payload.find({
+    req,
+    collection: 'pv_production',
+    where: {
+      installation: { equals: installationId },
+      from: { greater_than_equal: from },
+      to: { less_than_equal: to },
+    },
+    limit: -1,
+  })
+
+  // calculate update
+  const results = await Promise.all(
+    currentData.docs.map(async (production) => {
+      // first estimation by iterating through providers until
+      const estimated_production = await foldl<ProductionData, Promise<number | undefined>>(
+        async (service, result) =>
+          (await result)
+            ? Promise.resolve(result)
+            : await service.calculateForDateRange(
+                parseISO(production.from || ''),
+                parseISO(production.to || ''),
+              ),
+        Promise.resolve(undefined),
+        productionDataProviders,
+      )
+
+      return req.payload.db.drizzle
+        .update(pv_production_history)
+        .set({
+          energy_estimated_production: estimated_production,
+        })
+        .where(eq(pv_production_history.id, production.id))
+    }),
+  )
+  const numberOfUpdatedRows = results.map((r) => r.rowsAffected).reduce((a, b) => a + b)
+
+  console.log('Updated ' + numberOfUpdatedRows + ' rows')
+  return Response.json({ status: 'Ok', updated_rows: numberOfUpdatedRows })
 }
