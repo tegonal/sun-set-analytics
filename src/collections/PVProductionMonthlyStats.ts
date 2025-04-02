@@ -71,76 +71,70 @@ export async function recalculateStatisticsForTimeWindow(
   const pv_production_history = req.payload.db.tables['pv_production']
   const pv_production_monthly = req.payload.db.tables['pv_production_monthly_stats']
 
-  // Drop existing values
-  // for simplicity drop all months in the year touched by the range. Could be improved lated
-  console.log('Delete statistics for installation', installationId)
-  await req.payload.db.drizzle
-    .delete(pv_production_monthly)
-    .where(
-      and(
-        eq(pv_production_monthly.installation, installationId),
-        gte(pv_production_monthly.year, from.getFullYear()),
-        lte(pv_production_monthly.year, to.getFullYear()),
-      ),
-    )
-    .execute()
+  const result = await req.payload.db.drizzle.transaction(async (tx) => {
+    // Drop existing values
+    // for simplicity drop all months in the year touched by the range. Could be improved lated
+    console.log('Delete statistics for installation', installationId)
+    const deleteResult = await tx
+      .delete(pv_production_monthly)
+      .where(
+        and(
+          eq(pv_production_monthly.installation, installationId),
+          gte(pv_production_monthly.year, from.getFullYear()),
+          lte(pv_production_monthly.year, to.getFullYear()),
+        ),
+      )
+      .execute()
+    console.log('Deleted ' + deleteResult.rowsAffected + ' rows')
 
-  // Recalculate all values within those years
-  console.log('Recalculate statistics for installation', installationId)
-  const stats = req.payload.db.drizzle.$with('stats').as(
-    req.payload.db.drizzle
+    // Recalculate all values within those years
+    console.log('Recalculate statistics for installation', installationId)
+    // Those queries are SQLite specific. Whenever the db adapter gets replaces, those queries need to be adjusted
+    const groupSelect = tx.$with('stats').as(
+      tx
+        .select({
+          installation: sql`${installationId}`.as('installation'),
+          year: sql`strftime('%Y', ${pv_production_history.from})`.as('year'),
+          month: sql`strftime('%m', ${pv_production_history.from})`.as('month'),
+          energy_measured_production:
+            sql`SUM(${pv_production_history.energy_measured_production})`.as(
+              'energy_measured_production',
+            ),
+          energy_estimated_production:
+            sql`SUM(${pv_production_history.energy_estimated_production})`.as(
+              'energy_estimated_production',
+            ),
+        })
+        .from(pv_production_history)
+        .where(
+          and(
+            eq(pv_production_history.installation, installationId),
+            gte(sql`strftime('%Y', ${pv_production_history.from})`, from.getFullYear().toString()),
+            lte(sql`strftime('%Y', ${pv_production_history.to})`, to.getFullYear().toString()),
+          ),
+        )
+        .groupBy((r) => [r.installation, r.year, r.month]),
+    )
+    const selectQuery = tx
+      .with(groupSelect)
       .select({
-        installation: sql`inline(${installationId}`.as('installation'),
-        year: sql`YEAR(${pv_production_history.from})`.as('year'),
-        month: sql`MONTH(${pv_production_history.from})`.as('month'),
-        measured_production: sql`SUM(${pv_production_history.energy_measured_production})`.as(
-          'measured_production',
-        ),
-        estimated_production: sql`SUM(${pv_production_history.energy_estimated_production})`.as(
-          'estimated_production',
-        ),
+        id: sql`NULL`.as('id'),
+        installation: groupSelect.installation,
+        year: groupSelect.year,
+        month: groupSelect.month,
+        energy_measured_production: groupSelect.energy_measured_production,
+        energy_estimated_production: groupSelect.energy_estimated_production,
+        updatedAt: sql`datetime('now')`.as('updatedAt'),
+        createdAt: sql`datetime('now')`.as('createdAt'),
       })
-      .from(pv_production_history)
-      .where(eq(pv_production_history.installationId, installationId)),
-  )
-  const insertQuery = req.payload.db.drizzle
-    .with(stats)
-    .insert(pv_production_monthly)
-    /*.select(
-      req.payload.db.drizzle
-        .select({
-          installation: sql`inline(${installationId}`.as('installation'),
-          year: sql`YEAR(${pv_production_history.from})`.as('year'),
-          month: sql`MONTH(${pv_production_history.from})`.as('month'),
-          measured_production: sql`SUM(${pv_production_history.measured_production})`.as(
-            'measured_production',
-          ),
-          estimated_production: sql`SUM(${pv_production_history.estimated_production})`.as(
-            'estimated_production',
-          ),
-        })
-        .from(pv_production_history)
-        .where(eq(pv_production_history.installationId, installationId)),
-    )*/
-    .values(
-      req.payload.db.drizzle
-        .select({
-          installation: sql`inline(${installationId}`.as('installation'),
-          year: sql`YEAR(${pv_production_history.from})`.as('year'),
-          month: sql`MONTH(${pv_production_history.from})`.as('month'),
-          measured_production: sql`SUM(${pv_production_history.measured_production})`.as(
-            'measured_production',
-          ),
-          estimated_production: sql`SUM(${pv_production_history.estimated_production})`.as(
-            'estimated_production',
-          ),
-        })
-        .from(pv_production_history)
-        .where(eq(pv_production_history.installationId, installationId)),
-    )
-  //.values(sql`select * from stats`)
-  console.log('query', insertQuery.toSQL())
-  await insertQuery.execute()
+      .from(groupSelect)
 
-  return Response.json({ status: 'Ok' })
+    const insertQuery = tx.insert(pv_production_monthly).select(selectQuery)
+
+    const result = await insertQuery.execute()
+    console.log('Inserted ' + result.rowsAffected + ' rows')
+    return result
+  })
+
+  return Response.json({ status: 'Ok', stats_calculated: result.rowsAffected })
 }
