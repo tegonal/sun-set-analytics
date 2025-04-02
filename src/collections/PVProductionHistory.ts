@@ -4,6 +4,7 @@ import ky from 'ky'
 import { addDataAndFileToRequest, type CollectionConfig, type PayloadRequest } from 'payload'
 import { isOwner } from '@/access/whereOwnerOrAdmin'
 
+
 export const PVProductionHistory: CollectionConfig = {
   slug: 'pv_production',
   labels: {

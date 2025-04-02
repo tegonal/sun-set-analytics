@@ -2,6 +2,7 @@ import type { CollectionConfig } from 'payload'
 import { ROLE_SUPER_ADMIN, ROLE_USER } from '@/utilities/constants'
 import { isAdmin } from '@/access/whereOwnerOrAdmin'
 
+
 export const Users: CollectionConfig = {
   slug: 'users',
   admin: {
@@ -9,6 +10,7 @@ export const Users: CollectionConfig = {
     group: 'Settings',
   },
   access: {
+
     read: () => true,
     create: isAdmin,
     update: isAdmin,
@@ -25,8 +27,7 @@ export const Users: CollectionConfig = {
       name: 'installations',
       collection: 'installations',
       on: 'owner',
-    },
-    {
+    },    {
       type: 'select',
       name: 'role',
       defaultValue: ROLE_USER,
