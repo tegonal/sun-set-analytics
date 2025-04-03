@@ -1,45 +1,62 @@
 'use client'
 
 import {useEffect, useState} from 'react'
-import {PlotView} from './lineChart'
-import { Select, Heading, Label } from 'theme-ui'
 import ky from 'ky'
 
-interface InstallationOptions {
-    key: number
+import { Installation } from '@/payload-types'
+import {PlotView, analysisTypes, getAnalysisType} from './lineChart'
+
+import { Select, Label, Switch } from 'theme-ui'
+
+interface SelectOptions {
+    key: number | string
     label: string
 }
 
-export function ChartSettings({ config, updateConfig }: {config: PlotView, updateConfig: void}) {
+interface InstallationsResult {
+    docs: Installation[]
+}
+
+export function ChartSettings({ view, updateView }: {view: PlotView, updateView: (x: Partial<PlotView>) => void}) {
   
-  const [options, setOptions] = useState<InstallationOptions[]>([{key: 1, label: "One"}, {key: 2, label: "Two"}])
+  const [installationOptions, setInstallationOptions] = useState<SelectOptions[]>([])
 
   useEffect(() => {
     async function fetchData() {
-        const opt: InstallationOptions[] = []
-        const results = await ky.get('/api/installations/',{
+        const results: InstallationsResult = await ky.get('/api/installations/',{
         searchParams: {
-          //'where[or][0][and][0][installation][equals]': installation_id,
+          // TODO: filter by user 'where[or][0][and][0][installation][equals]': installation_id,
            depth:0,
            limit: 100}
         }).json()
-        console.log(results)
-        results.docs.forEach((i) => {
-                     console.log(i)
-                     opt.push({key: i.id, label: i.name})
-                }
-            )
-        setOptions(opt)
+        setInstallationOptions(
+          results.docs.flatMap((inst) => inst.name ? [{key: inst.id, label: inst.name}] : [])
+        )
     }   
     fetchData()
   }, [])
 
   return(<div>
-  <Heading as='h4'>Settings</Heading>
-  <Label>Installation:</Label>
-  <Select defaultValue="" onChange={(e) => updateConfig({installation_id: e.target.value})}>
-    { options.map((o) => (
+    <Label htmlFor="installation">Installation</Label>
+    <Select name="installation" mb={3} defaultValue="" onChange={(e) => updateView({installationId: parseInt(e.target.value)})}>
+      { installationOptions.map((o) => (
         <option key={o.key} value={o.key}>{o.label}</option>
-    ))}
-  </Select> {config.installation_id}</div>)
+      ))}
+    </Select>
+    <Label>Analysis Type</Label>
+    <Select name="type" mb={3} defaultValue="" onChange={(e) => updateView({analysisType: getAnalysisType(e.target.value)})} >
+      { analysisTypes.map((o) => (
+        <option key={o.name} value={o.name}>{o.title}</option>
+      ))}
+    </Select>
+    <Switch label="Stack years (TODO)" mb={3} sx={{
+      'input:checked ~ &': {
+        backgroundColor: '#4269d0',
+      },
+      }}
+      onChange={(e) => updateView({stackYears: e.target.checked})}
+    />
+    {view.installationId} | {view.analysisType.name} | {view.stackYears ? "y" : "n"}
+    </div>
+  )
 }

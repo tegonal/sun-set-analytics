@@ -2,7 +2,6 @@
 
 import { PvProductionMonthlyStat } from '@/payload-types'
 import * as Plot from '@observablehq/plot'
-//import * as d3 from 'd3'
 import ky from 'ky'
 import { useEffect, useRef, useState } from 'react'
 import { ChartSettings } from './chartSettings'
@@ -11,95 +10,149 @@ interface PlotData {
   date: Date
   estimated_production: number | null
   measured_production: number | null
+  diff_production: number | null
+  ratio_production: number | null
+}
+
+interface AnalysisType {
+  name: string
+  title: string
+  plot: (data: PlotData[]) => Plot.Markish[]
 }
 
 export interface PlotView {
-  title: string
-  installation_id: number
+  installationId: number
+  analysisType: AnalysisType
+  stackYears: boolean
 }
 
 interface MonthlyStatsResult {
   docs: PvProductionMonthlyStat[]
 }
 
-async function getData(installation_id: number): Promise<PlotData[]> {
-  const d: PlotData[] = []
+export const analysisTypes: AnalysisType[] = [
+  { name: "estimated_vs_measured_1",
+    title: "Estimated vs. Measured Production [kWh]",
+    plot: (data) => { return [
+      Plot.differenceY(data, {
+        x: 'date',
+        y1: 'estimated_production',
+        y2: 'measured_production',
+        curve: 'step-after',
+        tip: true})
+      ]}
+  },
+  { name: "estimated_vs_measured_2",
+    title: "Estimated vs. Measured Production [kWh] (lines)",
+    plot: (data) => { return [
+      Plot.line(data, {
+        x: 'date',
+        y: 'measured_production',
+        stroke: 1,
+        curve: 'step-after',
+        tip: true}),
+      Plot.line(data, {
+        x: 'date',
+        y: 'estimated_production',
+        stroke: 2,
+        curve: 'step-after',
+        tip: true}),
+      ]}
+  },
+  { name: "estimated_measured_difference",
+    title: "Difference between Estimated and Measured Production [kWh]",
+    plot: (data) => { return [
+      Plot.line(data, {
+        x: 'date',
+        y: 'diff_production',
+        curve: 'step-after',
+        tip: true}),
+      ]}
+  },
+  { name: "estimated_measured_ratio",
+    title: "Ratio between Estimated and Measured Production [%]",
+    plot: (data) => { return [
+      Plot.line(data, {
+        x: 'date',
+        y: 'ratio_production',
+        curve: 'step-after',
+        tip: true}),
+      ]}
+  },
+]
+
+export function getAnalysisType(name: string) {
+  return analysisTypes.find(item => item.name == name)
+}
+
+function calcMetrics(datapoint: PvProductionMonthlyStat) {
+  if (datapoint.year && datapoint.month && datapoint.energy) {
+    const estimated = datapoint.energy.estimated_production === undefined ? null : datapoint.energy.estimated_production
+    const measured = datapoint.energy.measured_production === undefined ? null : datapoint.energy.measured_production
+    return [{
+      date: new Date(datapoint.year, datapoint.month-1, 1),
+      estimated_production: estimated,
+      measured_production: measured,
+      diff_production: estimated != null && measured != null ? estimated-measured : null,
+      ratio_production: estimated && measured != null ? measured/estimated*100.0 : null,
+    }]
+  }
+  return []
+}
+
+async function getData(installationId: number): Promise<PlotData[]> {
   const result = await ky.get('/api/pv_production_monthly_stats',{
     searchParams: {
-      'where[or][0][and][0][installation][equals]': installation_id,
+      'where[or][0][and][0][installation][equals]': installationId,
        depth:0,
        limit: 100}
     }).json<MonthlyStatsResult>()
-  result.docs.forEach((dp) => {
-    if (dp.year && dp.month && dp.energy) {
-      const estimated = dp.energy.estimated_production === undefined ? null : dp.energy.estimated_production
-      const measured = dp.energy.measured_production === undefined ? null : dp.energy.measured_production
-      d.push({ date: new Date(dp.year, dp.month-1, 1), estimated_production: estimated, measured_production: measured})
-    }
-  })
-  /*const d: PlotData[] = [
-    { date: new Date(2022, 1 - 1, 15), value: 1 },
-    { date: new Date(2022, 2 - 1, 15), value: 2 },
-    { date: new Date(2022, 3 - 1, 15), value: 3 },
-    { date: new Date(2022, 4 - 1, 15), value: 2 },
-    { date: new Date(2022, 5 - 1, 15), value: 5 },
-    { date: new Date(2022, 6 - 1, 15), value: 6 },
-    { date: new Date(2022, 7 - 1, 15), value: 7 },
-  ]
-  console.log(d)*/
-  return d
+  return result.docs.flatMap(calcMetrics)
 }
 
 export function LineChart() {
   const containerRef = useRef<HTMLDivElement>(null)
   const [data, setData] = useState<PlotData[]>()
-  const [config, setConfig] = useState<PlotView>(
-    {installation_id: 3,
-     title: "Estimated vs. Measured Production [kWh]",
+  const [view, setView] = useState<PlotView>(
+    {installationId: 3,
+     analysisType: analysisTypes[0],
+     stackYears: false,
     }
   )
 
-  function updateConfig(updatedValue) {
+  function updateView(updatedValue: Partial<PlotView>) {
     console.log("update config:")
     console.log(updatedValue)
-    setConfig(config => ({
-      ...config,
+    setView(view => ({
+      ...view,
       ...updatedValue
     }))
   }
 
   useEffect(() => {
-    if (config) {
-      getData(config.installation_id).then((d) => setData(d))
+    if (view?.installationId) {
+      getData(view.installationId).then((d) => setData(d))
     }
-  }, [config, config.installation_id])
+  }, [view.installationId])
 
   useEffect(() => {
     if (data === undefined) return
     const plot = Plot.plot({
-      title: config.title,
+      title: view.analysisType.title,
       width: 800,
       y: { grid: true },
-      //color: { scheme: 'burd' },
-
-      marks: [
-        Plot.ruleY([0]),
-        /*Plot.line(data, { x: 'date', y: 'measured_production', curve: 'step-after', tip: true, stroke: 1}),
-        Plot.line(data, { x: 'date', y: 'estimated_production', curve: 'step-after', tip: true, stroke: 2 }),*/
-        Plot.differenceY(data, {x: 'date', y1: 'estimated_production', y2: 'measured_production', curve: 'step-after', tip: true}),
-        //Plot.crosshairX(data, { x: 'date', y: 'value' }),
-        Plot.frame(),
-      ],
+      marks: view.analysisType.plot(data).concat([Plot.frame()])
     })
     if (containerRef.current) {
       containerRef.current.append(plot)
     }
     return () => plot.remove()
-  }, [data, config.title])
+  }, [data, view])
+
   return (
     <div className="plotcontainer">
       <div className="plot" ref={containerRef} />
-      <ChartSettings config={config} updateConfig={updateConfig}/>
+      <ChartSettings view={view} updateView={updateView}/>
     </div>
   )
 }
