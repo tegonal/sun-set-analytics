@@ -57,6 +57,9 @@ importers:
       sharp:
         specifier: 0.32.6
         version: 0.32.6
+      theme-ui:
+        specifier: ^0.17.2
+        version: 0.17.2(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(react@19.0.0)
     devDependencies:
       '@eslint/eslintrc':
         specifier: ^3.2.0
@@ -356,6 +359,15 @@ packages:
 
   '@emotion/hash@0.9.2':
     resolution: {integrity: sha512-MyqliTZGuOm3+5ZRSaaBGP3USLw6+EGykkwZns2EPC5g8jJ4z9OrdZY9apkl3+UP9+sdz76YYkwCKP5gh8iY3g==}
+
+  '@emotion/is-prop-valid@0.8.8':
+    resolution: {integrity: sha512-u5WtneEAr5IDG2Wv65yhunPSMLIpuKsbuOktRojfrEiEvRyC85LgPMZI63cr7NUqT8ZIGdSVg8ZKGxIug4lXcA==}
+
+  '@emotion/memoize@0.7.4':
+    resolution: {integrity: sha512-Ja/Vfqe3HpuzRsG1oBtWTHk2PGZ7GR+2Vz5iYGelAw8dx32K0y7PjVuxK6z1nMpZOqAFsRUPCkK1YjJ56qJlgw==}
+
+  '@emotion/memoize@0.7.5':
+    resolution: {integrity: sha512-igX9a37DR2ZPGYtV6suZ6whr8pTFtyHL3K/oLUotxpSVO2ASaprmAe2Dkq7tBo7CRY7MMDrAa9nuQP9/YG8FxQ==}
 
   '@emotion/memoize@0.9.0':
     resolution: {integrity: sha512-30FAj7/EoJ5mwVPOWhAyCX+FPfMDrVecJAM+Iw9NRoSl4BBAQeqj4cApHHUXOVvIPgLVDsCFoz/hGD+5QQD1GQ==}
@@ -1534,11 +1546,89 @@ packages:
     resolution: {integrity: sha512-JtaY3FxmD+te+KSI2FJuEcfNC9T/DGGVf551babM7fAaXhjJUt7oSYurH1Devxd2+BOSUACCgt3buinx4UnmEA==}
     engines: {node: '>=18.0.0'}
 
+  '@styled-system/background@5.1.2':
+    resolution: {integrity: sha512-jtwH2C/U6ssuGSvwTN3ri/IyjdHb8W9X/g8Y0JLcrH02G+BW3OS8kZdHphF1/YyRklnrKrBT2ngwGUK6aqqV3A==}
+
+  '@styled-system/border@5.1.5':
+    resolution: {integrity: sha512-JvddhNrnhGigtzWRCVuAHepniyVi6hBlimxWDVAdcTuk7aRn9BYJUwfHslURtwYFsF5FoEs8Zmr1oZq2M1AP0A==}
+
+  '@styled-system/color@5.1.2':
+    resolution: {integrity: sha512-1kCkeKDZkt4GYkuFNKc7vJQMcOmTl3bJY3YBUs7fCNM6mMYJeT1pViQ2LwBSBJytj3AB0o4IdLBoepgSgGl5MA==}
+
+  '@styled-system/core@5.1.2':
+    resolution: {integrity: sha512-XclBDdNIy7OPOsN4HBsawG2eiWfCcuFt6gxKn1x4QfMIgeO6TOlA2pZZ5GWZtIhCUqEPTgIBta6JXsGyCkLBYw==}
+
+  '@styled-system/css@5.1.5':
+    resolution: {integrity: sha512-XkORZdS5kypzcBotAMPBoeckDs9aSZVkvrAlq5K3xP8IMAUek+x2O4NtwoSgkYkWWzVBu6DGdFZLR790QWGG+A==}
+
+  '@styled-system/flexbox@5.1.2':
+    resolution: {integrity: sha512-6hHV52+eUk654Y1J2v77B8iLeBNtc+SA3R4necsu2VVinSD7+XY5PCCEzBFaWs42dtOEDIa2lMrgL0YBC01mDQ==}
+
+  '@styled-system/grid@5.1.2':
+    resolution: {integrity: sha512-K3YiV1KyHHzgdNuNlaw8oW2ktMuGga99o1e/NAfTEi5Zsa7JXxzwEnVSDSBdJC+z6R8WYTCYRQC6bkVFcvdTeg==}
+
+  '@styled-system/layout@5.1.2':
+    resolution: {integrity: sha512-wUhkMBqSeacPFhoE9S6UF3fsMEKFv91gF4AdDWp0Aym1yeMPpqz9l9qS/6vjSsDPF7zOb5cOKC3tcKKOMuDCPw==}
+
+  '@styled-system/position@5.1.2':
+    resolution: {integrity: sha512-60IZfMXEOOZe3l1mCu6sj/2NAyUmES2kR9Kzp7s2D3P4qKsZWxD1Se1+wJvevb+1TP+ZMkGPEYYXRyU8M1aF5A==}
+
+  '@styled-system/shadow@5.1.2':
+    resolution: {integrity: sha512-wqniqYb7XuZM7K7C0d1Euxc4eGtqEe/lvM0WjuAFsQVImiq6KGT7s7is+0bNI8O4Dwg27jyu4Lfqo/oIQXNzAg==}
+
+  '@styled-system/should-forward-prop@5.1.5':
+    resolution: {integrity: sha512-+rPRomgCGYnUIaFabDoOgpSDc4UUJ1KsmlnzcEp0tu5lFrBQKgZclSo18Z1URhaZm7a6agGtS5Xif7tuC2s52Q==}
+
+  '@styled-system/space@5.1.2':
+    resolution: {integrity: sha512-+zzYpR8uvfhcAbaPXhH8QgDAV//flxqxSjHiS9cDFQQUSznXMQmxJegbhcdEF7/eNnJgHeIXv1jmny78kipgBA==}
+
+  '@styled-system/typography@5.1.2':
+    resolution: {integrity: sha512-BxbVUnN8N7hJ4aaPOd7wEsudeT7CxarR+2hns8XCX1zp0DFfbWw4xYa/olA0oQaqx7F1hzDg+eRaGzAJbF+jOg==}
+
+  '@styled-system/variant@5.1.5':
+    resolution: {integrity: sha512-Yn8hXAFoWIro8+Q5J8YJd/mP85Teiut3fsGVR9CAxwgNfIAiqlYxsk5iHU7VHJks/0KjL4ATSjmbtCDC/4l1qw==}
+
   '@swc/counter@0.1.3':
     resolution: {integrity: sha512-e2BR4lsJkkRlKZ/qCHPw9ZaSxc0MVUd7gtbtaB7aMvHeJVYe8sOB8DBZkP2DtISHGSku9sCK6T6cnY0CtXrOCQ==}
 
   '@swc/helpers@0.5.15':
     resolution: {integrity: sha512-JQ5TuMi45Owi4/BIMAJBoSQoOJu12oOk/gADqlcUL9JEdHB8vyjUSsxqeNXnmXHjYKMi2WcYtezGEEhqUI/E2g==}
+
+  '@theme-ui/color-modes@0.17.2':
+    resolution: {integrity: sha512-VSycDWzmEPZwZyJGbA83yKPzjzWzE88FQPRKT3QMHsvoD5dUXlF5tFOg0gEPu2cMhKbSWLCFi/Rtj7ANJDSF/w==}
+    peerDependencies:
+      '@emotion/react': ^11.13.3
+      react: '>=18'
+
+  '@theme-ui/components@0.17.2':
+    resolution: {integrity: sha512-CJeflLU2P6g+B7xn0NsAaWBiRlN3BknYX8lozTBlRwg53sHlHsbQzumtVerlWUlIa+muMx8kCxJYypYBAiaHhg==}
+    peerDependencies:
+      '@emotion/react': ^11.13.3
+      '@theme-ui/theme-provider': ^0.17.2
+      react: '>=18'
+
+  '@theme-ui/core@0.17.2':
+    resolution: {integrity: sha512-PMBaFCh/9HTlUZJFZRxZJoy+w/SVOJCr7v3s7XF5qyGcCuAB5tLv+fjcKpALaZ6QBT1SkHWd07AyTHrs0V2uRw==}
+    peerDependencies:
+      '@emotion/react': ^11.13.3
+      react: '>=18'
+
+  '@theme-ui/css@0.17.2':
+    resolution: {integrity: sha512-sYeurC8WbZBLumt8qO7rM6ZDyvneMh6JojeZov3uwu4Ty2iis8rhqGGK8LD1SfwsWcV8pu3AivQ9xyvWZeaQrw==}
+    peerDependencies:
+      '@emotion/react': ^11.11.1
+
+  '@theme-ui/global@0.17.2':
+    resolution: {integrity: sha512-yH4Gv/ESDKlxDLz0u5lR3EWAZLfnb4T0Zn1d1LnO7mHv/9dVbF+MA/ogCWLi8Xvs5/u1+RMSJkPfHWfw+Xp5AQ==}
+    peerDependencies:
+      '@emotion/react': ^11.13.3
+      react: '>=18'
+
+  '@theme-ui/theme-provider@0.17.2':
+    resolution: {integrity: sha512-Y454eONQU42xHaA6oyWmc3+ViRnKjpi0SAh9zFcz+WmJ2SJVZQ4A8XWXnJHjpq38DFju/AyeEfI4puZRHTkgjQ==}
+    peerDependencies:
+      '@emotion/react': ^11.13.3
+      react: '>=18'
 
   '@tokenizer/token@0.3.0':
     resolution: {integrity: sha512-OvjF+z51L3ov0OyAU0duzsYuvO01PH7x4t6DJx+guahgTnBHkhJdG7soQeTSFLWN3efnHyibZ4Z8l2EuWwJN3A==}
@@ -1597,6 +1687,9 @@ packages:
 
   '@types/react@19.0.12':
     resolution: {integrity: sha512-V6Ar115dBDrjbtXSrS+/Oruobc+qVbbUxDFC1RSbRqLt5SYvxxyIDrSC85RWml54g+jfNeEMZhEj7wW07ONQhA==}
+
+  '@types/styled-system@5.1.23':
+    resolution: {integrity: sha512-mIwCCdhDa2ifdQCEm8ZeD8m4UEbFsokqEoT9YNOUv4alUJ8jbMKxvpr+oOwfuZgwqLh5HjWuEzwnX7DzWvjFBg==}
 
   '@types/unist@2.0.11':
     resolution: {integrity: sha512-CmBKiL6NNo/OqgmMn95Fk9Whlp2mtvIv+KNpQKN2F4SjvrEesubTRWGYSg+BnWZOnlCaSTU1sMpsBOzgbYhnsA==}
@@ -3833,6 +3926,9 @@ packages:
       babel-plugin-macros:
         optional: true
 
+  styled-system@5.1.5:
+    resolution: {integrity: sha512-7VoD0o2R3RKzOzPK0jYrVnS8iJdfkKsQJNiLRDjikOpQVqQHns/DXWaPZOH4tIKkhAT7I6wIsy9FWTWh2X3q+A==}
+
   stylis@4.2.0:
     resolution: {integrity: sha512-Orov6g6BB1sDfYgzWfTHDOxamtX1bE/zo104Dh9e6fqJ3PooipYyfJ0pUmrZO2wAvO8YbEyeFrkV91XTsGMSrw==}
 
@@ -3862,6 +3958,12 @@ packages:
 
   text-decoder@1.2.3:
     resolution: {integrity: sha512-3/o9z3X0X0fTupwsYvR03pJ/DjWuqqrfwBgTQzdWDiQSm9KitAyz/9WqsT2JQW7KV2m+bC2ol/zqpW37NHxLaA==}
+
+  theme-ui@0.17.2:
+    resolution: {integrity: sha512-BuyJ7lkgGzmI63YPA90WYB+X4LbJTMm+j1a/qxjdl7evhLKRZkEE4Xs3bv66g9T+fuqq2T2TMrcY0BMzpWkOtQ==}
+    peerDependencies:
+      '@emotion/react': '>=11.1.1'
+      react: '>=18'
 
   thread-stream@3.1.0:
     resolution: {integrity: sha512-OqyPZ9u96VohAyMfJykzmivOrY2wfMSf3C5TtFJVgN+Hm6aj+voFhlK+kZEIv2FBh1X6Xp3DlnCOfEQ3B2J86A==}
@@ -4816,6 +4918,14 @@ snapshots:
       - supports-color
 
   '@emotion/hash@0.9.2': {}
+
+  '@emotion/is-prop-valid@0.8.8':
+    dependencies:
+      '@emotion/memoize': 0.7.4
+
+  '@emotion/memoize@0.7.4': {}
+
+  '@emotion/memoize@0.7.5': {}
 
   '@emotion/memoize@0.9.0': {}
 
@@ -6104,11 +6214,115 @@ snapshots:
       '@smithy/types': 4.2.0
       tslib: 2.8.1
 
+  '@styled-system/background@5.1.2':
+    dependencies:
+      '@styled-system/core': 5.1.2
+
+  '@styled-system/border@5.1.5':
+    dependencies:
+      '@styled-system/core': 5.1.2
+
+  '@styled-system/color@5.1.2':
+    dependencies:
+      '@styled-system/core': 5.1.2
+
+  '@styled-system/core@5.1.2':
+    dependencies:
+      object-assign: 4.1.1
+
+  '@styled-system/css@5.1.5': {}
+
+  '@styled-system/flexbox@5.1.2':
+    dependencies:
+      '@styled-system/core': 5.1.2
+
+  '@styled-system/grid@5.1.2':
+    dependencies:
+      '@styled-system/core': 5.1.2
+
+  '@styled-system/layout@5.1.2':
+    dependencies:
+      '@styled-system/core': 5.1.2
+
+  '@styled-system/position@5.1.2':
+    dependencies:
+      '@styled-system/core': 5.1.2
+
+  '@styled-system/shadow@5.1.2':
+    dependencies:
+      '@styled-system/core': 5.1.2
+
+  '@styled-system/should-forward-prop@5.1.5':
+    dependencies:
+      '@emotion/is-prop-valid': 0.8.8
+      '@emotion/memoize': 0.7.5
+      styled-system: 5.1.5
+
+  '@styled-system/space@5.1.2':
+    dependencies:
+      '@styled-system/core': 5.1.2
+
+  '@styled-system/typography@5.1.2':
+    dependencies:
+      '@styled-system/core': 5.1.2
+
+  '@styled-system/variant@5.1.5':
+    dependencies:
+      '@styled-system/core': 5.1.2
+      '@styled-system/css': 5.1.5
+
   '@swc/counter@0.1.3': {}
 
   '@swc/helpers@0.5.15':
     dependencies:
       tslib: 2.8.1
+
+  '@theme-ui/color-modes@0.17.2(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(react@19.0.0)':
+    dependencies:
+      '@emotion/react': 11.14.0(@types/react@19.0.12)(react@19.0.0)
+      '@theme-ui/core': 0.17.2(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(react@19.0.0)
+      '@theme-ui/css': 0.17.2(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))
+      deepmerge: 4.3.1
+      react: 19.0.0
+
+  '@theme-ui/components@0.17.2(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@theme-ui/theme-provider@0.17.2(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(react@19.0.0))(react@19.0.0)':
+    dependencies:
+      '@emotion/react': 11.14.0(@types/react@19.0.12)(react@19.0.0)
+      '@styled-system/color': 5.1.2
+      '@styled-system/should-forward-prop': 5.1.5
+      '@styled-system/space': 5.1.2
+      '@theme-ui/core': 0.17.2(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(react@19.0.0)
+      '@theme-ui/css': 0.17.2(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))
+      '@theme-ui/theme-provider': 0.17.2(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(react@19.0.0)
+      '@types/styled-system': 5.1.23
+      react: 19.0.0
+
+  '@theme-ui/core@0.17.2(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(react@19.0.0)':
+    dependencies:
+      '@emotion/react': 11.14.0(@types/react@19.0.12)(react@19.0.0)
+      '@theme-ui/css': 0.17.2(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))
+      deepmerge: 4.3.1
+      react: 19.0.0
+
+  '@theme-ui/css@0.17.2(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))':
+    dependencies:
+      '@emotion/react': 11.14.0(@types/react@19.0.12)(react@19.0.0)
+      csstype: 3.1.3
+
+  '@theme-ui/global@0.17.2(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(react@19.0.0)':
+    dependencies:
+      '@emotion/react': 11.14.0(@types/react@19.0.12)(react@19.0.0)
+      '@theme-ui/core': 0.17.2(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(react@19.0.0)
+      '@theme-ui/css': 0.17.2(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))
+      react: 19.0.0
+
+  '@theme-ui/theme-provider@0.17.2(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(react@19.0.0)':
+    dependencies:
+      '@emotion/react': 11.14.0(@types/react@19.0.12)(react@19.0.0)
+      '@theme-ui/color-modes': 0.17.2(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(react@19.0.0)
+      '@theme-ui/core': 0.17.2(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(react@19.0.0)
+      '@theme-ui/css': 0.17.2(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))
+      react: 19.0.0
 
   '@tokenizer/token@0.3.0': {}
 
@@ -6166,6 +6380,10 @@ snapshots:
       '@types/react': 19.0.12
 
   '@types/react@19.0.12':
+    dependencies:
+      csstype: 3.1.3
+
+  '@types/styled-system@5.1.23':
     dependencies:
       csstype: 3.1.3
 
@@ -8824,6 +9042,22 @@ snapshots:
       client-only: 0.0.1
       react: 19.0.0
 
+  styled-system@5.1.5:
+    dependencies:
+      '@styled-system/background': 5.1.2
+      '@styled-system/border': 5.1.5
+      '@styled-system/color': 5.1.2
+      '@styled-system/core': 5.1.2
+      '@styled-system/flexbox': 5.1.2
+      '@styled-system/grid': 5.1.2
+      '@styled-system/layout': 5.1.2
+      '@styled-system/position': 5.1.2
+      '@styled-system/shadow': 5.1.2
+      '@styled-system/space': 5.1.2
+      '@styled-system/typography': 5.1.2
+      '@styled-system/variant': 5.1.5
+      object-assign: 4.1.1
+
   stylis@4.2.0: {}
 
   supports-color@7.2.0:
@@ -8868,6 +9102,17 @@ snapshots:
   text-decoder@1.2.3:
     dependencies:
       b4a: 1.6.7
+
+  theme-ui@0.17.2(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(react@19.0.0):
+    dependencies:
+      '@emotion/react': 11.14.0(@types/react@19.0.12)(react@19.0.0)
+      '@theme-ui/color-modes': 0.17.2(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(react@19.0.0)
+      '@theme-ui/components': 0.17.2(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@theme-ui/theme-provider@0.17.2(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(react@19.0.0))(react@19.0.0)
+      '@theme-ui/core': 0.17.2(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(react@19.0.0)
+      '@theme-ui/css': 0.17.2(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))
+      '@theme-ui/global': 0.17.2(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(react@19.0.0)
+      '@theme-ui/theme-provider': 0.17.2(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(react@19.0.0)
+      react: 19.0.0
 
   thread-stream@3.1.0:
     dependencies:

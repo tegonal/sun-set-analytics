@@ -116,9 +116,14 @@ svg {
     }
   }
 
-  .plot {
+  .plotcontainer {
     background: rgb(240, 240, 240);
     color: rgb(0, 0, 0);
+    padding: 20px;
+  }
+  .plot {
+      background: rgb(240, 240, 240);
+      color: rgb(0, 0, 0);
   }
 
   .links {

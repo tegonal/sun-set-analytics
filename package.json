@@ -29,7 +29,8 @@
     "payload-oapi": "^0.2.0-b.0",
     "react": "19.0.0",
     "react-dom": "19.0.0",
-    "sharp": "0.32.6"
+    "sharp": "0.32.6",
+    "theme-ui": "^0.17.2"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
