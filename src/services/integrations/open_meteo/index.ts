@@ -3,12 +3,19 @@ import { EstimatedProductionProviderService, HourlyProductionData, ProductionDat
 import ky from 'ky'
 import { addHours, format, parseISO } from 'date-fns'
 
+export const OPEN_METEO_PROVIDER_SERVICE = 'open-meteo'
+
 export class OpenMeteoProductionProviderService implements EstimatedProductionProviderService {
   async fetchEstimatedProductionData(
     installation: Installation,
     from: Date,
     to: Date,
   ): Promise<ProductionData | undefined> {
+    if (!installation.open_meteo_config?.enabled) {
+      // not enabled
+      return Promise.resolve(undefined)
+    }
+
     const parsedResults = await Promise.all(
       (installation.panels || []).map(async (panel) => {
         const result = await ky
@@ -21,6 +28,7 @@ export class OpenMeteoProductionProviderService implements EstimatedProductionPr
               latitude: installation.location?.[1]?.toString() || '0',
               start_date: format(from, 'yyyy-MM-dd'),
               end_date: format(to, 'yyyy-MM-dd'),
+              models: 'satellite_radiation_seamless',
               // based on: https://arka360.com/ros/solar-irradiance-concepts/
               hourly: 'global_tilted_irradiance',
               timeformat: 'iso8601',
@@ -31,14 +39,17 @@ export class OpenMeteoProductionProviderService implements EstimatedProductionPr
           .json<OpenMeteoResult>()
 
         return new HourlyProductionData(
+          OPEN_METEO_PROVIDER_SERVICE,
           result.hourly.time.map((dateString, index) => {
             const irradiance = result.hourly.global_tilted_irradiance[index]
             const date = parseISO(dateString)
 
             // simplified calculation of power based on irradiance
-            // p = irradiance / 1000 * panel.system_loss * panel.peak_power
+            // p (W) = irradiance (Wh) * panel.system_loss * panel.peak_power (kWp)
             const value_watts_per_hour =
-              (irradiance / 1000) * (panel.system_loss || 1) * (panel.peak_power || 0)
+              ((irradiance * (100 - (panel.system_loss || 0))) / 100) * (panel.peak_power || 0)
+
+            //console.debug('Calculate value_watt ', dateString, irradiance, value_watts_per_hour)
             return {
               startTime: date.getTime(),
               endTime: addHours(date, 1).getTime(),
@@ -60,6 +71,7 @@ export class OpenMeteoProductionProviderService implements EstimatedProductionPr
         return a
       } else {
         return new HourlyProductionData(
+          OPEN_METEO_PROVIDER_SERVICE,
           a.values.map((item, i) => {
             return {
               ...item,

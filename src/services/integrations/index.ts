@@ -9,13 +9,17 @@ export interface EstimatedProductionProviderService {
 }
 
 export interface ProductionData {
+  source: string
+
   calculateForDateRange(from: Date, to: Date): Promise<number | undefined>
 }
 
 export class HourlyProductionData implements ProductionData {
   values: HourlyProductionDataEntry[]
-  constructor(values: HourlyProductionDataEntry[]) {
+  source: string
+  constructor(source: string, values: HourlyProductionDataEntry[]) {
     this.values = values
+    this.source = source
   }
   async calculateForDateRange(from: Date, to: Date): Promise<number | undefined> {
     const fromTime = from.getTime()
@@ -38,10 +42,10 @@ export class HourlyProductionData implements ProductionData {
             (value.endTime - value.startTime)
           return (value.value_watts_per_hour * factor) / 1000
         }
-        // no part of the time window
+        // not part of the time window
         return undefined
       })
-      .filter((a) => a)
+      .filter((a) => a !== undefined)
 
     if (fetchedValues.length > 0) {
       return fetchedValues.reduce((a, b) => a! + b!)

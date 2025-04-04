@@ -187,6 +187,9 @@ export interface Installation {
     mounting_type?: ('0' | '3' | '5' | '2') | null;
     pv_technology?: ('crystSi' | 'CIS' | 'CdTe') | null;
   };
+  open_meteo_config?: {
+    enabled?: boolean | null;
+  };
   updatedAt: string;
   createdAt: string;
 }
@@ -208,6 +211,10 @@ export interface PvProduction {
      * Estimated production data in kWh for the given location and within the provided time window
      */
     estimated_production?: number | null;
+    /**
+     * Source of estimated production data for this entry
+     */
+    estimated_production_source?: ('pvgis' | 'open-meteo') | null;
     /**
      * Estimated loss of pv production data due to weather conditions as percentage (0-100%)
      */
@@ -348,6 +355,11 @@ export interface InstallationsSelect<T extends boolean = true> {
         mounting_type?: T;
         pv_technology?: T;
       };
+  open_meteo_config?:
+    | T
+    | {
+        enabled?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }
@@ -364,6 +376,7 @@ export interface PvProductionSelect<T extends boolean = true> {
     | {
         measured_production?: T;
         estimated_production?: T;
+        estimated_production_source?: T;
         estimated_loss?: T;
       };
   updatedAt?: T;

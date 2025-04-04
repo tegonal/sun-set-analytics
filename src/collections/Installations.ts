@@ -89,7 +89,7 @@ export const Installations: CollectionConfig = {
     {
       type: 'group',
       name: 'PVGIS_config',
-      label: 'PVGIS configuration',
+      label: 'PVGIS integration',
       fields: [
         {
           type: 'checkbox',
@@ -152,6 +152,18 @@ export const Installations: CollectionConfig = {
               label: 'CdTe',
             },
           ],
+        },
+      ],
+    },
+    {
+      type: 'group',
+      name: 'open_meteo_config',
+      label: 'Open-Meteo integration',
+      fields: [
+        {
+          type: 'checkbox',
+          name: 'enabled',
+          defaultValue: true,
         },
       ],
     },

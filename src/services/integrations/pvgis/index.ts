@@ -1,7 +1,9 @@
 import { Installation } from '@/payload-types'
-import { EstimatedProductionProviderService, HourlyProductionData, ProductionData } from '..'
+import { EstimatedProductionProviderService, HourlyProductionData } from '..'
 import ky from 'ky'
 import { addHours, parse } from 'date-fns'
+
+export const PVGIS_PROVIDER_SERVICE = 'pvgis'
 
 export class PVGISProductionProviderService implements EstimatedProductionProviderService {
   async fetchEstimatedProductionData(
@@ -66,6 +68,7 @@ export class PVGISProductionProviderService implements EstimatedProductionProvid
 
     const enrich = (result: PVGISResult) => {
       return new HourlyProductionData(
+        PVGIS_PROVIDER_SERVICE,
         result.outputs.hourly.map((entry) => {
           // expected time format i.e.: '20170101:0010'
           const date = parse(entry.time, 'yyyyMMdd:HHmm', new Date())
