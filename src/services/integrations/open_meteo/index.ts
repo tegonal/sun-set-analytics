@@ -16,6 +16,14 @@ export class OpenMeteoProductionProviderService implements EstimatedProductionPr
       return Promise.resolve(undefined)
     }
 
+    // fetch at most until now
+    if (from.getTime() > Date.now()) {
+      from = new Date()
+    }
+    if (to.getTime() > Date.now()) {
+      to = new Date()
+    }
+
     const parsedResults = await Promise.all(
       (installation.panels || []).map(async (panel) => {
         const result = await ky
