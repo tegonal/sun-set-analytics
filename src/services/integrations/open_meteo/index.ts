@@ -28,7 +28,6 @@ export class OpenMeteoProductionProviderService implements EstimatedProductionPr
               latitude: installation.location?.[1]?.toString() || '0',
               start_date: format(from, 'yyyy-MM-dd'),
               end_date: format(to, 'yyyy-MM-dd'),
-              models: 'satellite_radiation_seamless',
               // based on: https://arka360.com/ros/solar-irradiance-concepts/
               hourly: 'global_tilted_irradiance',
               timeformat: 'iso8601',
