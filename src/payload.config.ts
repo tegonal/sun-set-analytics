@@ -12,6 +12,7 @@ import { Users } from './collections/Users'
 import { Installations } from './collections/Installations'
 import { PVProductionHistory } from './collections/PVProductionHistory'
 import { PVProductionMonthlyStats } from './collections/PVProductionMonthlyStats'
+import { ConsoleLogWriter, DefaultLogger, Logger } from '@payloadcms/db-sqlite/drizzle'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)

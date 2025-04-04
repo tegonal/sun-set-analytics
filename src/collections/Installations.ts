@@ -1,8 +1,40 @@
-import type { Collection, CollectionConfig, User } from 'payload'
-import { importPVProductionData } from './PVProductionHistory'
+import type { CollectionConfig, PayloadRequest } from 'payload'
+import {
+  importPVProductionData,
+  recalculateEstimatedProductionForTimeWindow,
+} from './PVProductionHistory'
 import { recalculateStatisticsForTimeWindow } from './PVProductionMonthlyStats'
 import { parseISO } from 'date-fns'
 import { isOwner } from '@/access/whereOwnerOrAdmin'
+import { Installation } from '@/payload-types'
+
+const validateUserAndInstallation = async (
+  req: PayloadRequest,
+  body: (installation: Installation) => Promise<Response>,
+) => {
+  if (!req.routeParams?.id) {
+    return Response.json({ error: `Missing installation id in path` }, { status: 400 })
+  }
+  if (!req.user) {
+    return Response.json({ error: `Missing user in the request` }, { status: 401 })
+  }
+
+  const installation = await req.payload.findByID({
+    collection: 'installations',
+    id: req.routeParams?.id as number,
+  })
+  if (!installation) {
+    return Response.json({ error: `Missing installation` }, { status: 400 })
+  }
+
+  if (
+    (typeof installation.owner === 'number' && installation.owner !== req.user.id) ||
+    (typeof installation.owner === 'object' && installation.owner?.id !== req.user.id)
+  ) {
+    return Response.json({ error: 'You have no permission' }, { status: 403 })
+  }
+  return body(installation)
+}
 
 export const Installations: CollectionConfig = {
   slug: 'installations',
@@ -86,7 +118,7 @@ export const Installations: CollectionConfig = {
     {
       type: 'group',
       name: 'PVGIS_config',
-      label: 'PVGIS configuration',
+      label: 'PVGIS integration',
       fields: [
         {
           type: 'checkbox',
@@ -152,52 +184,34 @@ export const Installations: CollectionConfig = {
         },
       ],
     },
+    {
+      type: 'group',
+      name: 'open_meteo_config',
+      label: 'Open-Meteo integration',
+      fields: [
+        {
+          type: 'checkbox',
+          name: 'enabled',
+          defaultValue: true,
+        },
+      ],
+    },
   ],
   endpoints: [
     {
       method: 'post',
       path: '/:id/import-production-data',
       handler: async (req) => {
-        if (!req.routeParams?.id) {
-          return Response.json({ error: `Missing installation id in path` }, { status: 400 })
-        }
-        if (!req.user?.id) {
-          return Response.json({ error: `Missing user in the request` }, { status: 400 })
-        }
-
-        const user = await req.payload.findByID({
-          collection: 'users',
-          id: req.user?.id as number,
-        })
-        const installation = await req.payload.findByID({
-          collection: 'installations',
-          id: req.routeParams?.id as number,
-        })
-
-        if (typeof installation.owner !== 'number' && installation.owner.id === user.id) {
-          return importPVProductionData(req, req.routeParams?.id as number)
-        } else {
-          return Response.json({ error: 'You have no permission' }, { status: 403 })
-        }
+        return await validateUserAndInstallation(
+          req,
+          async (installation) => await importPVProductionData(req, installation),
+        )
       },
     },
     {
       method: 'post',
       path: '/:id/recalculate-monthly-stats',
       handler: async (req) => {
-        const user = await req.payload.findByID({
-          collection: 'users',
-          id: req.user?.id as number,
-        })
-        const installation = await req.payload.findByID({
-          collection: 'installations',
-          id: req.routeParams?.id as number,
-        })
-
-        if (!req.routeParams?.id) {
-          return Response.json({ error: `Missing installation id in path` }, { status: 400 })
-        }
-
         const fromParam = req.searchParams?.get('from')
         if (!fromParam) {
           return Response.json({ error: `Missing 'from' query parameter` }, { status: 400 })
@@ -210,11 +224,34 @@ export const Installations: CollectionConfig = {
         const from = parseISO(fromParam)
         const to = parseISO(toParam)
 
-        if (typeof installation.owner !== 'number' && installation.owner.id === user.id) {
-          return recalculateStatisticsForTimeWindow(req, req.routeParams?.id as number, from, to)
-        } else {
-          return Response.json({ error: 'You have no permission' }, { status: 403 })
+        return await validateUserAndInstallation(
+          req,
+          async (installation) =>
+            await recalculateStatisticsForTimeWindow(req, installation, from, to),
+        )
+      },
+    },
+    {
+      method: 'post',
+      path: '/:id/recalculate-estimated-production',
+      handler: async (req) => {
+        const fromParam = req.searchParams?.get('from')
+        if (!fromParam) {
+          return Response.json({ error: `Missing 'from' query parameter` }, { status: 400 })
         }
+        const toParam = req.searchParams?.get('to')
+        if (!toParam) {
+          return Response.json({ error: `Missing 'to' query parameter` }, { status: 400 })
+        }
+
+        const from = parseISO(fromParam)
+        const to = parseISO(toParam)
+
+        return await validateUserAndInstallation(
+          req,
+          async (installation) =>
+            await recalculateEstimatedProductionForTimeWindow(req, installation, from, to),
+        )
       },
     },
   ],
