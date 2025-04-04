@@ -1,5 +1,7 @@
 import {
   addDataAndFileToRequest,
+  Data,
+  DateField,
   DateFieldValidation,
   type CollectionConfig,
   type PayloadRequest,
@@ -17,9 +19,9 @@ import {
 } from '@/services/integrations/open_meteo'
 import { parseISO } from 'date-fns'
 import { eq } from '@payloadcms/db-sqlite/drizzle'
-import { Installation } from '@/payload-types'
+import { Installation, PvProduction } from '@/payload-types'
 
-export const fromToValidation: DateFieldValidation = (val, { data }) => {
+export const fromToValidation: DateFieldValidation = (val, { data }: { data: Data }) => {
   if (!data || !val) {
     return true
   }
