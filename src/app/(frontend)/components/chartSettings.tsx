@@ -83,7 +83,7 @@ export function ChartSettings({
         ))}
       </Select>
       <Switch
-        label="Stack years (TODO)"
+        label="Stack years (WIP)"
         mb={3}
         sx={{
           'input:checked ~ &': {
