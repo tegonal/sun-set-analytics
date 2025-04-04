@@ -1,5 +1,3 @@
-
-import { Access } from 'payload'
 import { ROLE_SUPER_ADMIN } from '@/utilities/constants'
 
 export const isOwner = ({ req: { user } }) => {

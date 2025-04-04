@@ -105,12 +105,6 @@ export class PVGISProductionProviderService implements EstimatedProductionProvid
     return enrich(mergedResult)
   }
 }
-interface PVGISParsedOutput {
-  P: number
-  // enriched information
-  startTime: number
-  endTime: number
-}
 
 interface PVGISResult {
   outputs: {
