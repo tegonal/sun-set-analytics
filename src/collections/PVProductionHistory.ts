@@ -33,9 +33,6 @@ export const PVProductionHistory: CollectionConfig = {
     singular: 'PV production history entry',
     plural: 'PV production history entries',
   },
-  auth: {
-    useAPIKey: true,
-  },
   admin: {
     group: 'Solar data',
   },
