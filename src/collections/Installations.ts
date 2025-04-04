@@ -95,8 +95,8 @@ export const Installations: CollectionConfig = {
         {
           type: 'number',
           name: 'azimuth',
-          min: -90,
-          max: 90,
+          min: -180,
+          max: 180,
           admin: {
             description:
               'The azimuth, or orientation, is the angle of the PV modules relative to the direction due South. -90° is East, 0° is South and 90° is West.',
