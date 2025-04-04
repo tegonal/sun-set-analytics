@@ -1,10 +1,10 @@
-import { Access } from 'payload'
+import { Access, PayloadRequest } from 'payload'
 import { ROLE_SUPER_ADMIN } from '@/utilities/constants'
 
-export const isOwner = ({ req: { user } }) => {
+export const isOwner = ({ req }: { req: PayloadRequest }) => {
   return {
     owner: {
-      equals: user?.id,
+      equals: req.user?.id,
     },
   }
 }
@@ -39,8 +39,8 @@ export const isOwnerOfReferencedInstallationCreate: Access = async ({ req, data 
   return result.totalDocs > 0
 }
 
-export const isAdmin = ({ req: { user } }) => {
-  if (user?.role === ROLE_SUPER_ADMIN) {
+export const isAdmin = ({ req }: { req: PayloadRequest }) => {
+  if (req.user?.role === ROLE_SUPER_ADMIN) {
     return true
   }
   return false
