@@ -1,10 +1,10 @@
-import { Access } from 'payload'
+import { Access, PayloadRequest } from 'payload'
 import { ROLE_SUPER_ADMIN } from '@/utilities/constants'
 
-export const isOwner = ({ req: { user } }) => {
+export const isOwner = ({ req }: { req: PayloadRequest }) => {
   return {
     owner: {
-      equals: user?.id,
+      equals: req.user?.id,
     },
   }
 }
@@ -15,17 +15,10 @@ export const isOwnerOfReferencedInstallation: Access = ({ req }) => {
 }
 
 export const isOwnerOfReferencedInstallationCreate: Access = async ({ req, data }) => {
-  //if (!id) {
-  //    return true
-  //}
-
-  console.debug('installation:', data)
-
   if (!data || !data.installation) {
     return false
   }
 
-  // Query another Collection using the `id`
   const result = await req.payload.find({
     collection: 'installations',
     limit: 0,
@@ -39,8 +32,8 @@ export const isOwnerOfReferencedInstallationCreate: Access = async ({ req, data 
   return result.totalDocs > 0
 }
 
-export const isAdmin = ({ req: { user } }) => {
-  if (user?.role === ROLE_SUPER_ADMIN) {
+export const isAdmin = ({ req }: { req: PayloadRequest }) => {
+  if (req.user?.role === ROLE_SUPER_ADMIN) {
     return true
   }
   return false
