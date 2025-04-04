@@ -17,6 +17,7 @@ import {
 } from '@/services/integrations/open_meteo'
 import { parseISO } from 'date-fns'
 import { eq } from '@payloadcms/db-sqlite/drizzle'
+import { Installation } from '@/payload-types'
 
 export const fromToValidation: DateFieldValidation = (val, { data }) => {
   if (!data || !val) {
@@ -198,12 +199,12 @@ const estimateProduction = async (
 
 export async function importPVProductionData(
   req: PayloadRequest,
-  installationId: number,
+  installation: Installation,
 ): Promise<Response> {
   await addDataAndFileToRequest(req)
   const pv_production_history = req.payload.db.tables['pv_production']
   if (req.json) {
-    console.debug('import data for installation', installationId)
+    console.debug('import data for installation', installation.name)
     const data: PVProductionImport = await req.json()
 
     if (!data || !data.measured_production || data.measured_production.length === 0) {
@@ -236,12 +237,6 @@ export async function importPVProductionData(
       .sort((a, b) => a.getTime() - b.getTime())[0]
     const latestTo = parseEntries.map((x) => x.to).sort((a, b) => b.getTime() - a.getTime())[0]
 
-    const installation = await req.payload.findByID({
-      req,
-      id: installationId,
-      collection: 'installations',
-    })
-
     const productionDataProviders = (
       await Promise.all(
         PRODUCTION_PROVIDER_SERVICES.map(
@@ -266,7 +261,7 @@ export async function importPVProductionData(
 
             const data = {
               id: null,
-              installation: installationId,
+              installation: installation.id,
               from: row.from.toISOString(),
               to: row.to.toISOString(),
               energy_measured_production: row.production,
@@ -284,7 +279,7 @@ export async function importPVProductionData(
     })
     process.stdout.write('\n')
 
-    await recalculateStatisticsForTimeWindow(req, installationId, earliestFrom, latestTo)
+    await recalculateStatisticsForTimeWindow(req, installation, earliestFrom, latestTo)
 
     return Response.json({ status: 'Ok' })
   } else {
@@ -294,15 +289,10 @@ export async function importPVProductionData(
 
 export async function recalculateEstimatedProductionForTimeWindow(
   req: PayloadRequest,
-  installationId: number,
+  installation: Installation,
   from: Date,
   to: Date,
 ): Promise<Response> {
-  const installation = await req.payload.findByID({
-    req,
-    id: installationId,
-    collection: 'installations',
-  })
   const pv_production_history = req.payload.db.tables['pv_production']
 
   // fetch pv production data from database
@@ -315,7 +305,7 @@ export async function recalculateEstimatedProductionForTimeWindow(
       to: true,
     },
     where: {
-      installation: { equals: installationId },
+      installation: { equals: installation.id },
       from: { greater_than_equal: from.toISOString() },
       to: { less_than_equal: to.toISOString() },
     },
@@ -365,7 +355,7 @@ export async function recalculateEstimatedProductionForTimeWindow(
   console.log('Updated ' + updatedRows + ' rows, ignored ' + ignoredRows + 'rows')
 
   // recalculate monthly stats
-  await recalculateStatisticsForTimeWindow(req, installationId, from, to)
+  await recalculateStatisticsForTimeWindow(req, installation, from, to)
 
   return Response.json({ status: 'Ok', updated_rows: updatedRows, ignored_rows: ignoredRows })
 }

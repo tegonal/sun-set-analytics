@@ -1,6 +1,7 @@
 import { and, eq, gte, lte, sql } from '@payloadcms/db-sqlite/drizzle'
 import type { CollectionConfig, PayloadRequest } from 'payload'
 import { isOwner } from '@/access/whereOwnerOrAdmin'
+import { Installation } from '@/payload-types'
 
 export const PVProductionMonthlyStats: CollectionConfig = {
   slug: 'pv_production_monthly_stats',
@@ -71,7 +72,7 @@ export const PVProductionMonthlyStats: CollectionConfig = {
 
 export async function recalculateStatisticsForTimeWindow(
   req: PayloadRequest,
-  installationId: number,
+  installation: Installation,
   from: Date,
   to: Date,
 ): Promise<Response> {
@@ -81,12 +82,12 @@ export async function recalculateStatisticsForTimeWindow(
   const result = await req.payload.db.drizzle.transaction(async (tx) => {
     // Drop existing values
     // for simplicity drop all months in the year touched by the range. Could be improved lated
-    console.log('Delete statistics for installation', installationId)
+    console.log('Delete statistics for installation', installation.name)
     const deleteResult = await tx
       .delete(pv_production_monthly)
       .where(
         and(
-          eq(pv_production_monthly.installation, installationId),
+          eq(pv_production_monthly.installation, installation.id),
           gte(pv_production_monthly.year, from.getFullYear()),
           lte(pv_production_monthly.year, to.getFullYear()),
         ),
@@ -95,12 +96,12 @@ export async function recalculateStatisticsForTimeWindow(
     console.log('Deleted ' + deleteResult.rowsAffected + ' rows')
 
     // Recalculate all values within those years
-    console.log('Recalculate statistics for installation', installationId)
+    console.log('Recalculate statistics for installation', installation.name)
     // Those queries are SQLite specific. Whenever the db adapter gets replaces, those queries need to be adjusted
     const groupSelect = tx.$with('stats').as(
       tx
         .select({
-          installation: sql`${installationId}`.as('installation'),
+          installation: sql`${installation.id}`.as('installation'),
           year: sql`strftime('%Y', ${pv_production_history.from})`.as('year'),
           month: sql`strftime('%m', ${pv_production_history.from})`.as('month'),
           energy_measured_production:
@@ -115,7 +116,7 @@ export async function recalculateStatisticsForTimeWindow(
         .from(pv_production_history)
         .where(
           and(
-            eq(pv_production_history.installation, installationId),
+            eq(pv_production_history.installation, installation.id),
             gte(sql`strftime('%Y', ${pv_production_history.from})`, from.getFullYear().toString()),
             lte(sql`strftime('%Y', ${pv_production_history.to})`, to.getFullYear().toString()),
           ),
