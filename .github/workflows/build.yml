@@ -2,18 +2,18 @@ name: Build application on commit
 on:
   workflow_call:
   pull_request:
-  push:
-    paths:
-      - '**'
     branches:
-      - '**'
-    tags-ignore: ['*']
+      - main
+  push:
+    branches:
+      - main
 
 env:
   NODE_VERSION: 22.14
 
 jobs:
   build:
+    if: github.event_name == 'pull_request' || gihtub.
     runs-on: ubuntu-latest
 
     steps:
@@ -49,7 +49,7 @@ jobs:
             pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
 
       - run: pnpm install
-      - run: pnpm run build:all
+      - run: pnpm run build
         env:
           DO_NOT_TRACK: 1 # Disable Turbopack telemetry
 
