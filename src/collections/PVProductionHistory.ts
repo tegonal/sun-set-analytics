@@ -7,7 +7,10 @@ import {
   type PayloadRequest,
 } from 'payload'
 import { recalculateStatisticsForTimeWindow } from './PVProductionMonthlyStats'
-import { isOwner } from '@/access/whereOwnerOrAdmin'
+import {
+  isOwnerOfReferencedInstallation,
+  isOwnerOfReferencedInstallationCreate,
+} from '@/access/whereOwnerOrAdmin'
 import { ProductionData } from '@/services/integrations'
 import {
   PVGIS_PROVIDER_SERVICE,
@@ -48,10 +51,10 @@ export const PVProductionHistory: CollectionConfig = {
     group: 'Solar data',
   },
   access: {
-    read: isOwner,
-    create: isOwner,
-    update: isOwner,
-    delete: isOwner,
+    read: isOwnerOfReferencedInstallation,
+    create: isOwnerOfReferencedInstallationCreate,
+    update: isOwnerOfReferencedInstallation,
+    delete: isOwnerOfReferencedInstallation,
   },
   fields: [
     {
