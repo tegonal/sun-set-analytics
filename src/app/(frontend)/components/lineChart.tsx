@@ -35,7 +35,7 @@ interface MonthlyStatsResult {
 export const analysisTypes: AnalysisType[] = [
   {
     name: 'estimated_vs_measured_1',
-    title: 'Estimated vs. Measured Production [kWh]',
+    title: 'Measured vs. Estimated Production [kWh]',
     plot: (data, stacked) => {
       if (stacked) {
         return [
@@ -43,6 +43,13 @@ export const analysisTypes: AnalysisType[] = [
             x: 'year',
             y: 'measured_production',
             fill: 'yearString',
+            fx: 'month',
+            tip: true,
+          }),
+          Plot.barY(data, {
+            x: 'year',
+            y: 'estimated_production',
+            stroke: 'black',
             fx: 'month',
             tip: true,
           }),
@@ -61,20 +68,38 @@ export const analysisTypes: AnalysisType[] = [
   },
   {
     name: 'estimated_vs_measured_2',
-    title: 'Estimated vs. Measured Production [kWh] (lines)',
-    plot: (data) => {
+    title: 'Measured vs. Estimated Production [kWh] (line graphs)',
+    plot: (data, stacked) => {
+      if (stacked) {
+        return [
+          Plot.barY(data, {
+            x: 'year',
+            y: 'measured_production',
+            fill: 'yearString',
+            fx: 'month',
+            tip: true,
+          }),
+          Plot.barY(data, {
+            x: 'year',
+            y: 'estimated_production',
+            stroke: 'black',
+            fx: 'month',
+            tip: true,
+          }),
+        ]
+      }
       return [
         Plot.line(data, {
           x: 'date',
           y: 'measured_production',
-          stroke: 1,
+          stroke: 'black',
           curve: 'step-after',
           tip: true,
         }),
         Plot.line(data, {
           x: 'date',
           y: 'estimated_production',
-          stroke: 2,
+          stroke: 'blue',
           curve: 'step-after',
           tip: true,
         }),
@@ -176,22 +201,6 @@ async function getData(installationId: number): Promise<PlotData[]> {
   return result.docs.flatMap(calcMetrics)
 }
 
-/*function binAnnualData(data: PlotData[]): PlotDataAnnual[] {
-  const years = new Set(data.map((dp) => dp.date.getFullYear()))
-  const annualData: PlotDataAnnual[] = []
-  years.forEach((year) => {
-    annualData.push({
-      year: year,
-      monthly_data: data
-        .filter((dp) => dp.date.getFullYear() == year)
-        .map((dp) => {
-          return { ...dp, date: new Date(1900, dp.date.getMonth(), 1) }
-        }),
-    })
-  })
-  return annualData
-}*/
-
 export function LineChart() {
   const containerRef = useRef<HTMLDivElement>(null)
   const [data, setData] = useState<PlotData[]>()
@@ -202,8 +211,6 @@ export function LineChart() {
   })
 
   function updateView(updatedValue: Partial<PlotView>) {
-    console.log('update config:')
-    console.log(updatedValue)
     setView((view) => ({
       ...view,
       ...updatedValue,
@@ -218,14 +225,13 @@ export function LineChart() {
 
   useEffect(() => {
     if (data === undefined) return
-    //const plotData = view.stackYears ? binAnnualData(data) : data
     const plot = Plot.plot({
       title: view.analysisType.title,
       width: 800,
       color: { scheme: 'spectral', legend: true, type: 'ordinal' },
       y: { grid: true, tickFormat: 's' },
       x: view.stackYears ? { axis: null } : {},
-      marks: view.analysisType.plot(data, view.stackYears), //.concat([Plot.frame()]),
+      marks: view.analysisType.plot(data, view.stackYears),
     })
     if (containerRef.current) {
       containerRef.current.append(plot)

@@ -83,7 +83,7 @@ export function ChartSettings({
         ))}
       </Select>
       <Switch
-        label="Stack years (WIP)"
+        label="Compare years"
         mb={3}
         sx={{
           'input:checked ~ &': {
@@ -92,7 +92,6 @@ export function ChartSettings({
         }}
         onChange={(e) => updateView({ stackYears: e.target.checked })}
       />
-      {view.installationId} | {view.analysisType.name} | {view.stackYears ? 'y' : 'n'}
     </div>
   )
 }
