@@ -8,16 +8,18 @@ import { ChartSettings } from './chartSettings'
 
 interface PlotData {
   date: Date
+  yearString: string
+  year: number
+  month: number
   estimated_production: number | null
   measured_production: number | null
   diff_production: number | null
   ratio_production: number | null
 }
-
 interface AnalysisType {
   name: string
   title: string
-  plot: (data: PlotData[]) => Plot.Markish[]
+  plot: (data: PlotData[], stacked: boolean) => Plot.Markish[]
 }
 
 export interface PlotView {
@@ -33,8 +35,26 @@ interface MonthlyStatsResult {
 export const analysisTypes: AnalysisType[] = [
   {
     name: 'estimated_vs_measured_1',
-    title: 'Estimated vs. Measured Production [kWh]',
-    plot: (data) => {
+    title: 'Measured vs. Estimated Production [kWh]',
+    plot: (data, stacked) => {
+      if (stacked) {
+        return [
+          Plot.barY(data, {
+            x: 'year',
+            y: 'measured_production',
+            fill: 'yearString',
+            fx: 'month',
+            tip: true,
+          }),
+          Plot.barY(data, {
+            x: 'year',
+            y: 'estimated_production',
+            stroke: 'black',
+            fx: 'month',
+            tip: true,
+          }),
+        ]
+      }
       return [
         Plot.differenceY(data, {
           x: 'date',
@@ -48,20 +68,38 @@ export const analysisTypes: AnalysisType[] = [
   },
   {
     name: 'estimated_vs_measured_2',
-    title: 'Estimated vs. Measured Production [kWh] (lines)',
-    plot: (data) => {
+    title: 'Measured vs. Estimated Production [kWh] (line graphs)',
+    plot: (data, stacked) => {
+      if (stacked) {
+        return [
+          Plot.barY(data, {
+            x: 'year',
+            y: 'measured_production',
+            fill: 'yearString',
+            fx: 'month',
+            tip: true,
+          }),
+          Plot.barY(data, {
+            x: 'year',
+            y: 'estimated_production',
+            stroke: 'black',
+            fx: 'month',
+            tip: true,
+          }),
+        ]
+      }
       return [
         Plot.line(data, {
           x: 'date',
           y: 'measured_production',
-          stroke: 1,
+          stroke: 'black',
           curve: 'step-after',
           tip: true,
         }),
         Plot.line(data, {
           x: 'date',
           y: 'estimated_production',
-          stroke: 2,
+          stroke: 'blue',
           curve: 'step-after',
           tip: true,
         }),
@@ -71,7 +109,18 @@ export const analysisTypes: AnalysisType[] = [
   {
     name: 'estimated_measured_difference',
     title: 'Difference between Estimated and Measured Production [kWh]',
-    plot: (data) => {
+    plot: (data, stacked) => {
+      if (stacked) {
+        return [
+          Plot.barY(data, {
+            x: 'year',
+            y: 'diff_production',
+            fill: 'yearString',
+            fx: 'month',
+            tip: true,
+          }),
+        ]
+      }
       return [
         Plot.line(data, {
           x: 'date',
@@ -85,7 +134,18 @@ export const analysisTypes: AnalysisType[] = [
   {
     name: 'estimated_measured_ratio',
     title: 'Ratio between Estimated and Measured Production [%]',
-    plot: (data) => {
+    plot: (data, stacked) => {
+      if (stacked) {
+        return [
+          Plot.barY(data, {
+            x: 'year',
+            y: 'ratio_production',
+            fill: 'yearString',
+            fx: 'month',
+            tip: true,
+          }),
+        ]
+      }
       return [
         Plot.line(data, {
           x: 'date',
@@ -115,6 +175,9 @@ function calcMetrics(datapoint: PvProductionMonthlyStat) {
     return [
       {
         date: new Date(datapoint.year, datapoint.month - 1, 1),
+        yearString: datapoint.year.toString(),
+        year: datapoint.year,
+        month: datapoint.month,
         estimated_production: estimated,
         measured_production: measured,
         diff_production: estimated != null && measured != null ? estimated - measured : null,
@@ -148,8 +211,6 @@ export function LineChart() {
   })
 
   function updateView(updatedValue: Partial<PlotView>) {
-    console.log('update config:')
-    console.log(updatedValue)
     setView((view) => ({
       ...view,
       ...updatedValue,
@@ -167,8 +228,10 @@ export function LineChart() {
     const plot = Plot.plot({
       title: view.analysisType.title,
       width: 800,
-      y: { grid: true },
-      marks: view.analysisType.plot(data).concat([Plot.frame()]),
+      color: { scheme: 'spectral', legend: true, type: 'ordinal' },
+      y: { grid: true, tickFormat: 's' },
+      x: view.stackYears ? { axis: null } : {},
+      marks: view.analysisType.plot(data, view.stackYears),
     })
     if (containerRef.current) {
       containerRef.current.append(plot)
