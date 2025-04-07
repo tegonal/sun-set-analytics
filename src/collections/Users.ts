@@ -16,6 +16,7 @@ export const Users: CollectionConfig = {
   },
   auth: {
     useAPIKey: true,
+    depth: 2,
   },
   fields: [
     // Email added by default

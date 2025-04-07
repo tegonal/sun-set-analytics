@@ -1,6 +1,9 @@
 import { and, eq, gte, lte, sql } from '@payloadcms/db-sqlite/drizzle'
 import type { CollectionConfig, PayloadRequest } from 'payload'
-import { isOwner } from '@/access/whereOwnerOrAdmin'
+import {
+  isOwnerOfReferencedInstallation,
+  isOwnerOfReferencedInstallationCreate,
+} from '@/access/whereOwnerOrAdmin'
 import { Installation } from '@/payload-types'
 
 export const PVProductionMonthlyStats: CollectionConfig = {
@@ -15,10 +18,10 @@ export const PVProductionMonthlyStats: CollectionConfig = {
     hidden: false,
   },
   access: {
-    read: () => true,
-    create: () => true,
-    update: () => true,
-    delete: () => true,
+    read: isOwnerOfReferencedInstallation,
+    create: isOwnerOfReferencedInstallationCreate,
+    update: isOwnerOfReferencedInstallation,
+    delete: isOwnerOfReferencedInstallation,
   },
   fields: [
     {
