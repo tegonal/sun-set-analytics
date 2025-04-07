@@ -28,7 +28,7 @@
     "payload-oapi": "0.2.0",
     "react": "19.0.0",
     "react-dom": "19.0.0",
-    "sharp": "0.33.5",
+    "sharp": "0.34.0",
     "theme-ui": "^0.17.2"
   },
   "devDependencies": {
