@@ -8,9 +8,9 @@ import { ChartSettings } from './chartSettings'
 
 interface PlotData {
   date: Date
-  yearString: string | null
-  year: number | null
-  month: number | null
+  yearString: string
+  year: number
+  month: number
   estimated_production: number | null
   measured_production: number | null
   diff_production: number | null
