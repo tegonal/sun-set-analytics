@@ -15,10 +15,10 @@ export const PVProductionMonthlyStats: CollectionConfig = {
     hidden: false,
   },
   access: {
-    read: isOwner,
-    create: isOwner,
-    update: isOwner,
-    delete: isOwner,
+    read: () => true,
+    create: () => true,
+    update: () => true,
+    delete: () => true,
   },
   fields: [
     {
