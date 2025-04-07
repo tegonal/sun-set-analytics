@@ -1,4 +1,5 @@
 import {
+  Access,
   addDataAndFileToRequest,
   Data,
   DateField,
@@ -48,10 +49,10 @@ export const PVProductionHistory: CollectionConfig = {
     group: 'Solar data',
   },
   access: {
-    read: isOwner,
-    create: isOwner,
-    update: isOwner,
-    delete: isOwner,
+    read: () => true,
+    create: () => true,
+    update: () => true,
+    delete: () => true,
   },
   fields: [
     {
