@@ -38,3 +38,7 @@ export const isAdmin = ({ req }: { req: PayloadRequest }) => {
   }
   return false
 }
+
+export const isAdminOrSelf: Access = ({ req, id }) => {
+  return isAdmin({ req }) || req.user?.id === id
+}

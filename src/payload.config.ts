@@ -24,6 +24,15 @@ export default buildConfig({
     importMap: {
       baseDir: path.resolve(dirname),
     },
+    components: {
+      afterNavLinks: ['/components/stats_nav'],
+      views: {
+        statistics: {
+          Component: '/components/stats_layout',
+          path: '/statistics',
+        },
+      },
+    },
   },
   collections: [Users, Installations, PVProductionHistory, PVProductionMonthlyStats],
   editor: lexicalEditor(),

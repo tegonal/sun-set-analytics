@@ -1,6 +1,6 @@
 import type { CollectionConfig } from 'payload'
 import { ROLE_SUPER_ADMIN, ROLE_USER } from '@/utilities/constants'
-import { isAdmin } from '@/access/whereOwnerOrAdmin'
+import { isAdmin, isAdminOrSelf } from '@/access/whereOwnerOrAdmin'
 
 export const Users: CollectionConfig = {
   slug: 'users',
@@ -9,9 +9,9 @@ export const Users: CollectionConfig = {
     group: 'Settings',
   },
   access: {
-    read: () => true,
+    read: isAdminOrSelf,
     create: isAdmin,
-    update: isAdmin,
+    update: isAdminOrSelf,
     delete: isAdmin,
   },
   auth: {
