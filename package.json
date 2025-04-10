@@ -15,6 +15,7 @@
     "start": "cross-env NODE_OPTIONS=--no-deprecation next start"
   },
   "dependencies": {
+    "@libsql/client": "^0.15.2",
     "@observablehq/plot": "^0.6.17",
     "@payloadcms/db-sqlite": "^3.33.0",
     "@payloadcms/next": "^3.33.0",
@@ -24,6 +25,7 @@
     "graphql": "^16.10.0",
     "ky": "^1.8.0",
     "next": "15.3.0",
+    "libsql": "^0.5.4",
     "payload": "^3.33.0",
     "payload-oapi": "0.2.0",
     "react": "19.1.0",
@@ -31,13 +33,22 @@
     "sharp": "0.34.1",
     "theme-ui": "^0.17.2"
   },
+  "optionalDependencies": {
+    "@libsql/darwin-arm64": "^0.5.4",
+    "@libsql/linux-arm64-gnu": "^0.5.4",
+    "@libsql/linux-x64-gnu": "^0.5.4",
+    "@libsql/linux-x64-musl": "^0.5.4"
+  },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
+    "@next/eslint-plugin-next": "^15.2.5",
     "@types/node": "^22.14.0",
     "@types/react": "19.1.0",
     "@types/react-dom": "19.1.2",
     "eslint": "^9.24.0",
     "eslint-config-next": "15.3.0",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^5.2.0",
     "prettier": "^3.5.3",
     "typescript": "5.8.3"
   },
