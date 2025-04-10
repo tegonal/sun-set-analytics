@@ -160,27 +160,25 @@ export interface Installation {
    * @maxItems 2
    */
   location?: [number, number] | null;
-  panels?:
-    | {
-        /**
-         * This is the power that the manufacturer declares that the PV array can produce under standard test conditions, which are a constant 1000W of solar irradiance per square meter in the plane of the array, at an array temperature of 25°C. The peak power should be entered in kilowatt-peak (kWp). If you do not know the declared peak power of your modules but instead know the area of the modules (in m2) and the declared conversion efficiency (in percent), you can calculate the peak power as power (kWp) = 1 kW/m2 * area * efficiency / 100.
-         */
-        peak_power?: number | null;
-        /**
-         * This is the angle of the PV modules from the horizontal plane, for a fixed (non-tracking) mounting.
-         */
-        slope?: number | null;
-        /**
-         * The azimuth, or orientation, is the angle of the PV modules relative to the direction due South. -90° is East, 0° is South and 90° is West.
-         */
-        azimuth?: number | null;
-        /**
-         * The estimated system losses are all the losses in the system, which cause the power actually delivered to the electricity grid to be lower than the power produced by the PV modules. There are several causes for this loss, such as losses in cables, power inverters, dirt (sometimes snow) on the modules and so on. Over the years the modules also tend to lose a bit of their power, so the average yearly output over the lifetime of the system will be a few percent lower than the output in the first years.
-         */
-        system_loss?: number | null;
-        id?: string | null;
-      }[]
-    | null;
+  panels: {
+    /**
+     * This is the power that the manufacturer declares that the PV array can produce under standard test conditions, which are a constant 1000W of solar irradiance per square meter in the plane of the array, at an array temperature of 25°C. The peak power should be entered in kilowatt-peak (kWp). If you do not know the declared peak power of your modules but instead know the area of the modules (in m2) and the declared conversion efficiency (in percent), you can calculate the peak power as power (kWp) = 1 kW/m2 * area * efficiency / 100.
+     */
+    peak_power?: number | null;
+    /**
+     * This is the angle of the PV modules from the horizontal plane, for a fixed (non-tracking) mounting.
+     */
+    slope?: number | null;
+    /**
+     * The azimuth, or orientation, is the angle of the PV modules relative to the direction due South. -90° is East, 0° is South and 90° is West.
+     */
+    azimuth?: number | null;
+    /**
+     * The estimated system losses are all the losses in the system, which cause the power actually delivered to the electricity grid to be lower than the power produced by the PV modules. There are several causes for this loss, such as losses in cables, power inverters, dirt (sometimes snow) on the modules and so on. Over the years the modules also tend to lose a bit of their power, so the average yearly output over the lifetime of the system will be a few percent lower than the output in the first years.
+     */
+    system_loss?: number | null;
+    id?: string | null;
+  }[];
   PVGIS_config?: {
     enabled?: boolean | null;
     radiation_database?: ('PVGIS-SARAH3' | 'PVGIS-ERA5') | null;

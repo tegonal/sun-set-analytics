@@ -20,7 +20,7 @@ import {
   OpenMeteoProductionProviderService,
 } from '@/services/integrations/open_meteo'
 import { parseISO } from 'date-fns'
-import { eq } from '@payloadcms/db-sqlite/drizzle'
+import { and, eq, gte, lte } from '@payloadcms/db-sqlite/drizzle'
 import { Installation } from '@/payload-types'
 
 export const fromToValidation: DateFieldValidation = (val, { data }: { data: Data }) => {
@@ -289,6 +289,31 @@ export async function importPVProductionData(
   } else {
     return Response.error()
   }
+}
+
+export async function deletePVProductionData(
+  req: PayloadRequest,
+  installation: Installation,
+  from: Date,
+  to: Date,
+): Promise<Response> {
+  console.debug('delete production data for', installation.name, from, to)
+  const pv_production = req.payload.db.tables['pv_production']
+  const result = await req.payload.db.drizzle
+    .delete(pv_production)
+    .where(
+      and(
+        eq(pv_production.installation, installation.id),
+        gte(pv_production.from, from.toISOString()),
+        lte(pv_production.to, to.toISOString()),
+      ),
+    )
+    .execute()
+
+  // recalculate monthly stats
+  await recalculateStatisticsForTimeWindow(req, installation, from, to)
+
+  return Response.json({ status: 'Ok', delete_rows: result.rowsAffected })
 }
 
 export async function recalculateEstimatedProductionForTimeWindow(

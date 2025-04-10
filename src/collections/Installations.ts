@@ -1,11 +1,12 @@
 import type { CollectionConfig, PayloadRequest } from 'payload'
 import {
+  deletePVProductionData,
   importPVProductionData,
   recalculateEstimatedProductionForTimeWindow,
 } from './PVProductionHistory'
 import { recalculateStatisticsForTimeWindow } from './PVProductionMonthlyStats'
 import { parseISO } from 'date-fns'
-import { isOwner } from '@/access/whereOwnerOrAdmin'
+import { isAdminOrSelf, isOwner } from '@/access/whereOwnerOrAdmin'
 import { Installation } from '@/payload-types'
 
 const validateUserAndInstallation = async (
@@ -56,6 +57,10 @@ export const Installations: CollectionConfig = {
       hasMany: false,
       required: true,
       index: true,
+      defaultValue: ({ user }) => user?.id,
+      admin: {
+        hidden: true,
+      },
     },
     {
       type: 'text',
@@ -71,6 +76,7 @@ export const Installations: CollectionConfig = {
       type: 'array',
       name: 'panels',
       minRows: 1,
+      required: true,
       fields: [
         {
           type: 'number',
@@ -210,7 +216,7 @@ export const Installations: CollectionConfig = {
     },
     {
       method: 'post',
-      path: '/:id/recalculate-monthly-stats',
+      path: '/:id/delete-production-data',
       handler: async (req) => {
         const fromParam = req.searchParams?.get('from')
         if (!fromParam) {
@@ -226,8 +232,7 @@ export const Installations: CollectionConfig = {
 
         return await validateUserAndInstallation(
           req,
-          async (installation) =>
-            await recalculateStatisticsForTimeWindow(req, installation, from, to),
+          async (installation) => await deletePVProductionData(req, installation, from, to),
         )
       },
     },
@@ -251,6 +256,29 @@ export const Installations: CollectionConfig = {
           req,
           async (installation) =>
             await recalculateEstimatedProductionForTimeWindow(req, installation, from, to),
+        )
+      },
+    },
+    {
+      method: 'post',
+      path: '/:id/recalculate-monthly-stats',
+      handler: async (req) => {
+        const fromParam = req.searchParams?.get('from')
+        if (!fromParam) {
+          return Response.json({ error: `Missing 'from' query parameter` }, { status: 400 })
+        }
+        const toParam = req.searchParams?.get('to')
+        if (!toParam) {
+          return Response.json({ error: `Missing 'to' query parameter` }, { status: 400 })
+        }
+
+        const from = parseISO(fromParam)
+        const to = parseISO(toParam)
+
+        return await validateUserAndInstallation(
+          req,
+          async (installation) =>
+            await recalculateStatisticsForTimeWindow(req, installation, from, to),
         )
       },
     },
