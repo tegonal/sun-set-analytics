@@ -41,7 +41,7 @@ importers:
         version: 16.10.0
       ky:
         specifier: ^1.8.0
-        version: 1.8.0
+        version: 1.8.1
       libsql:
         specifier: ^0.5.4
         version: 0.5.4
@@ -2732,8 +2732,8 @@ packages:
     resolution: {integrity: sha512-eTIzlVOSUR+JxdDFepEYcBMtZ9Qqdef+rnzWdRZuMbOywu5tO2w2N7rqjoANZ5k9vywhL6Br1VRjUIgTQx4E8w==}
     engines: {node: '>=6'}
 
-  ky@1.8.0:
-    resolution: {integrity: sha512-DoKGmG27nT8t/1F9gV8vNzggJ3mLAyD49J8tTMWHeZvS8qLc7GlyTieicYtFzvDznMe/q2u38peOjkWc5/pjvw==}
+  ky@1.8.1:
+    resolution: {integrity: sha512-7Bp3TpsE+L+TARSnnDpk3xg8Idi8RwSLdj6CMbNWoOARIrGrbuLGusV0dYwbZOm4bB3jHNxSw8Wk/ByDqJEnDw==}
     engines: {node: '>=18'}
 
   language-subtag-registry@0.3.23:
@@ -2750,8 +2750,8 @@ packages:
   lexical@0.28.0:
     resolution: {integrity: sha512-dLE3O1PZg0TlZxRQo9YDpjCjDUj8zluGyBO9MHdjo21qZmMUNrxQPeCRt8fn2s5l4HKYFQ1YNgl7k1pOJB/vZQ==}
 
-  lib0@0.2.102:
-    resolution: {integrity: sha512-g70kydI0I1sZU0ChO8mBbhw0oUW/8U0GHzygpvEIx8k+jgOpqnTSb/E+70toYVqHxBhrERD21TwD5QcZJQ40ZQ==}
+  lib0@0.2.104:
+    resolution: {integrity: sha512-1tqKRANSPTcjs/yjPoKh52oRM2u5AYdd8jie8sDiN8/5kpWWiQSHUGgtB4VEXLw1chVL3QPSPp8q9RWqzSn2FA==}
     engines: {node: '>=16'}
     hasBin: true
 
@@ -6505,7 +6505,7 @@ snapshots:
 
   kleur@3.0.3: {}
 
-  ky@1.8.0: {}
+  ky@1.8.1: {}
 
   language-subtag-registry@0.3.23: {}
 
@@ -6520,7 +6520,7 @@ snapshots:
 
   lexical@0.28.0: {}
 
-  lib0@0.2.102:
+  lib0@0.2.104:
     dependencies:
       isomorphic.js: 0.2.5
 
@@ -7777,7 +7777,7 @@ snapshots:
 
   yjs@13.6.24:
     dependencies:
-      lib0: 0.2.102
+      lib0: 0.2.104
 
   yocto-queue@0.1.0: {}
 
