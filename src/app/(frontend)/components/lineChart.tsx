@@ -193,12 +193,13 @@ async function getData(installationId: number): Promise<PlotData[]> {
     .get('/api/pv_production_monthly_stats', {
       searchParams: {
         'where[or][0][and][0][installation][equals]': installationId,
+        sort: '-year,-month',
         depth: 0,
-        limit: 100,
+        limit: 120,
       },
     })
     .json<MonthlyStatsResult>()
-  return result.docs.flatMap(calcMetrics)
+  return result.docs.reverse().flatMap(calcMetrics)
 }
 
 export function LineChart() {
