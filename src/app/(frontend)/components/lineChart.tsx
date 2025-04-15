@@ -8,8 +8,7 @@ import { ChartSettings } from './chartSettings'
 
 interface PlotData {
   date: Date
-  yearString: string
-  year: number
+  year: string
   month: number
   estimated_production: number | null
   measured_production: number | null
@@ -32,6 +31,8 @@ interface MonthlyStatsResult {
   docs: PvProductionMonthlyStat[]
 }
 
+const formatNumber = (d) => Intl.NumberFormat(undefined, { maximumFractionDigits: 2 }).format(d)
+
 export const analysisTypes: AnalysisType[] = [
   {
     name: 'estimated_vs_measured_1',
@@ -42,26 +43,47 @@ export const analysisTypes: AnalysisType[] = [
           Plot.barY(data, {
             x: 'year',
             y: 'measured_production',
-            fill: 'yearString',
+            fill: 'year',
             fx: 'month',
-            tip: true,
+            channels: {
+              measured_production: 'measured_production',
+              estimated_production: 'estimated_production',
+            },
+            tip: {
+              format: {
+                x: true,
+                fx: true,
+                measured_production: (d) => `${formatNumber(d)} kWh`,
+                estimated_production: (d) => `${formatNumber(d)} kWh`,
+              },
+            },
           }),
           Plot.barY(data, {
             x: 'year',
             y: 'estimated_production',
             stroke: 'black',
             fx: 'month',
-            tip: true,
           }),
         ]
       }
       return [
+        Plot.ruleY([0]),
         Plot.differenceY(data, {
           x: 'date',
           y1: 'estimated_production',
           y2: 'measured_production',
           curve: 'step-after',
-          tip: true,
+          channels: {
+            measured_production: 'measured_production',
+            estimated_production: 'estimated_production',
+          },
+          tip: {
+            format: {
+              x: true,
+              measured_production: (d) => `${formatNumber(d)} kWh`,
+              estimated_production: (d) => `${formatNumber(d)} kWh`,
+            },
+          },
         }),
       ]
     },
@@ -75,33 +97,53 @@ export const analysisTypes: AnalysisType[] = [
           Plot.barY(data, {
             x: 'year',
             y: 'measured_production',
-            fill: 'yearString',
+            fill: 'year',
             fx: 'month',
-            tip: true,
+            channels: {
+              measured_production: 'measured_production',
+              estimated_production: 'estimated_production',
+            },
+            tip: {
+              format: {
+                x: true,
+                fx: true,
+                measured_production: (d) => `${formatNumber(d)} kWh`,
+                estimated_production: (d) => `${formatNumber(d)} kWh`,
+              },
+            },
           }),
           Plot.barY(data, {
             x: 'year',
             y: 'estimated_production',
             stroke: 'black',
             fx: 'month',
-            tip: true,
           }),
         ]
       }
       return [
+        Plot.ruleY([0]),
         Plot.line(data, {
           x: 'date',
           y: 'measured_production',
           stroke: 'black',
           curve: 'step-after',
-          tip: true,
+          channels: {
+            measured_production: 'measured_production',
+            estimated_production: 'estimated_production',
+          },
+          tip: {
+            format: {
+              x: true,
+              measured_production: (d) => `${formatNumber(d)} kWh`,
+              estimated_production: (d) => `${formatNumber(d)} kWh`,
+            },
+          },
         }),
         Plot.line(data, {
           x: 'date',
           y: 'estimated_production',
           stroke: 'blue',
           curve: 'step-after',
-          tip: true,
         }),
       ]
     },
@@ -115,9 +157,15 @@ export const analysisTypes: AnalysisType[] = [
           Plot.barY(data, {
             x: 'year',
             y: 'diff_production',
-            fill: 'yearString',
+            fill: 'year',
             fx: 'month',
-            tip: true,
+            tip: {
+              format: {
+                x: true,
+                fx: true,
+                y: (d) => `${formatNumber(d)} kWh`,
+              },
+            },
           }),
         ]
       }
@@ -126,7 +174,12 @@ export const analysisTypes: AnalysisType[] = [
           x: 'date',
           y: 'diff_production',
           curve: 'step-after',
-          tip: true,
+          tip: {
+            format: {
+              x: true,
+              y: (d) => `${formatNumber(d)} kWh`,
+            },
+          },
         }),
       ]
     },
@@ -140,9 +193,15 @@ export const analysisTypes: AnalysisType[] = [
           Plot.barY(data, {
             x: 'year',
             y: 'ratio_production',
-            fill: 'yearString',
+            fill: 'year',
             fx: 'month',
-            tip: true,
+            tip: {
+              format: {
+                x: true,
+                fx: true,
+                y: (d) => `${formatNumber(d)}%`,
+              },
+            },
           }),
         ]
       }
@@ -151,7 +210,12 @@ export const analysisTypes: AnalysisType[] = [
           x: 'date',
           y: 'ratio_production',
           curve: 'step-after',
-          tip: true,
+          tip: {
+            format: {
+              x: true,
+              y: (d) => `${formatNumber(d)}%`,
+            },
+          },
         }),
       ]
     },
@@ -175,8 +239,7 @@ function calcMetrics(datapoint: PvProductionMonthlyStat) {
     return [
       {
         date: new Date(datapoint.year, datapoint.month - 1, 1),
-        yearString: datapoint.year.toString(),
-        year: datapoint.year,
+        year: datapoint.year.toString(),
         month: datapoint.month,
         estimated_production: estimated,
         measured_production: measured,
