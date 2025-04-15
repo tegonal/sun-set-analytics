@@ -5,7 +5,7 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
-  drizzle-orm: ^0.41.0
+  drizzle-orm: ^0.42.0
   drizzle-proxy: ^0.41.0
 
 importers:
@@ -1988,8 +1988,8 @@ packages:
     resolution: {integrity: sha512-KqI+CS2Ga9GYIrXpxpCDUJJrH/AT/k4UY0Pb4oRgQEGkgN1EdCnqp664cXgwPWjDr5RBtTsjZipw8+8C//K63A==}
     hasBin: true
 
-  drizzle-orm@0.41.0:
-    resolution: {integrity: sha512-7A4ZxhHk9gdlXmTdPj/lREtP+3u8KvZ4yEN6MYVxBzZGex5Wtdc+CWSbu7btgF6TB0N+MNPrvW7RKBbxJchs/Q==}
+  drizzle-orm@0.42.0:
+    resolution: {integrity: sha512-pS8nNJm2kBNZwrOjTHJfdKkaU+KuUQmV/vk5D57NojDq4FG+0uAYGMulXtYT///HfgsMF0hnFFvu1ezI3OwOkg==}
     peerDependencies:
       '@aws-sdk/client-rds-data': '>=3'
       '@cloudflare/workers-types': '>=4'
@@ -1999,7 +1999,7 @@ packages:
       '@neondatabase/serverless': '>=0.10.0'
       '@op-engineering/op-sqlite': '>=2'
       '@opentelemetry/api': ^1.4.1
-      '@planetscale/database': '>=1'
+      '@planetscale/database': '>=1.13'
       '@prisma/client': '*'
       '@tidbcloud/serverless': '*'
       '@types/better-sqlite3': '*'
@@ -4619,7 +4619,7 @@ snapshots:
       '@payloadcms/drizzle': 3.34.0(@libsql/client@0.14.0)(payload@3.34.0(graphql@16.10.0)(typescript@5.8.3))
       console-table-printer: 2.12.1
       drizzle-kit: 0.28.0
-      drizzle-orm: 0.41.0(@libsql/client@0.14.0)
+      drizzle-orm: 0.42.0(@libsql/client@0.14.0)
       payload: 3.34.0(graphql@16.10.0)(typescript@5.8.3)
       prompts: 2.4.2
       to-snake-case: 1.0.0
@@ -4659,7 +4659,7 @@ snapshots:
   '@payloadcms/drizzle@3.34.0(@libsql/client@0.14.0)(payload@3.34.0(graphql@16.10.0)(typescript@5.8.3))':
     dependencies:
       console-table-printer: 2.12.1
-      drizzle-orm: 0.41.0(@libsql/client@0.14.0)
+      drizzle-orm: 0.42.0(@libsql/client@0.14.0)
       payload: 3.34.0(graphql@16.10.0)(typescript@5.8.3)
       prompts: 2.4.2
       to-snake-case: 1.0.0
@@ -5644,7 +5644,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  drizzle-orm@0.41.0(@libsql/client@0.14.0):
+  drizzle-orm@0.42.0(@libsql/client@0.14.0):
     optionalDependencies:
       '@libsql/client': 0.14.0
 
