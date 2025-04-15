@@ -31,7 +31,8 @@ interface MonthlyStatsResult {
   docs: PvProductionMonthlyStat[]
 }
 
-const formatNumber = (d) => Intl.NumberFormat(undefined, { maximumFractionDigits: 2 }).format(d)
+const formatNumber = (d: number) =>
+  Intl.NumberFormat(undefined, { maximumFractionDigits: 2 }).format(d)
 
 export const analysisTypes: AnalysisType[] = [
   {
