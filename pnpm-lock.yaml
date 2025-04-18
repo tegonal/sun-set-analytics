@@ -103,7 +103,7 @@ importers:
     optionalDependencies:
       '@libsql/darwin-arm64':
         specifier: ^0.5.5
-        version: 0.5.5
+        version: 0.5.7
       '@libsql/linux-arm64-gnu':
         specifier: ^0.5.5
         version: 0.5.5
@@ -998,6 +998,11 @@ packages:
 
   '@libsql/darwin-arm64@0.5.5':
     resolution: {integrity: sha512-PEWL5G+VYZjJSE1ljqJccc1L37l6FR/SyGpgFAs96vqevTBUFQ20p5ytvHhy4PmA9TuB+6GcoFq/UOjYcaw2Sg==}
+    cpu: [arm64]
+    os: [darwin]
+
+  '@libsql/darwin-arm64@0.5.7':
+    resolution: {integrity: sha512-3rex2cdEihYY5HIxOvn66CxdvEtjQDXyrX+EggaV3Qf4vZOWeow+jIqVjZoNLmfb7AwJuSL088G645zyMitcbQ==}
     cpu: [arm64]
     os: [darwin]
 
@@ -4478,6 +4483,9 @@ snapshots:
     optional: true
 
   '@libsql/darwin-arm64@0.5.5':
+    optional: true
+
+  '@libsql/darwin-arm64@0.5.7':
     optional: true
 
   '@libsql/darwin-x64@0.4.7':
