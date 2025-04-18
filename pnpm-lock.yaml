@@ -106,7 +106,7 @@ importers:
         version: 0.5.5
       '@libsql/linux-arm64-gnu':
         specifier: ^0.5.5
-        version: 0.5.5
+        version: 0.5.7
       '@libsql/linux-x64-gnu':
         specifier: ^0.5.5
         version: 0.5.5
@@ -1028,6 +1028,11 @@ packages:
 
   '@libsql/linux-arm64-gnu@0.5.5':
     resolution: {integrity: sha512-OCT6u5m3X8uuSaJtvrrJ1k4EjZADUs4whRSelKKgGLho0H47G86YkhbqXbmMN9GEREpUcgVkA0HfxQzrglQTjQ==}
+    cpu: [arm64]
+    os: [linux]
+
+  '@libsql/linux-arm64-gnu@0.5.7':
+    resolution: {integrity: sha512-86PusgAOzxu8e/8YCxwdbi8/6HkBRWW49FCXgAqVjlDaNC/08jSQy7XnIZuRqHYRNg9uXk3fZ+Nug/6kbEqH5Q==}
     cpu: [arm64]
     os: [linux]
 
@@ -4510,6 +4515,9 @@ snapshots:
     optional: true
 
   '@libsql/linux-arm64-gnu@0.5.5':
+    optional: true
+
+  '@libsql/linux-arm64-gnu@0.5.7':
     optional: true
 
   '@libsql/linux-arm64-musl@0.4.7':
