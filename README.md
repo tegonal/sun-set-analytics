@@ -16,7 +16,7 @@
 
 # sun-set-analytics
 
-This project enables users to analyse the degradation of their solar panels over time
+This project enables users to analyse the degradation of their solar panels over time. It compares the produced energy of a photovoltaic system (PV production) with an estimate of the expected yield at that location.
 
 ---
 ❗ You are taking a *sneak peek* at the next version. It could be that some features you find on this page are not
@@ -54,7 +54,7 @@ You can start sun-set-analytics based on the published docker image. To start th
 
 ## Setup user and installation
 
-On the first start, you first need to create a new user. Based on the role selected, the user has different permissions. A `User` can manage installations and the pv production data of the owned installations. An `Admin` can additionally create new users. 
+On the first start, you first need to create a new user. Based on the role selected, the user has different permissions. A `User` can manage installations and the PV production data of the owned installations. An `Admin` can additionally create new users. 
 
 > Be aware that at the moment no additional check prevents a user to upgrade his role to an `Admin` account
 
@@ -72,7 +72,7 @@ Read more about the API Strategy in the [payload documentation](https://payloadc
 
 ### Upload PV production data
 
-The application provides custom endpoint to be able to upload pv production data. Those data are automatically enriched with data from either 
+The application provides custom endpoint to be able to upload PV production data. Those data are automatically enriched with data from either 
 * [Photovoltaic Geographical Information System (PVGIS) des EU Science Hub](https://joint-research-centre.ec.europa.eu/photovoltaic-geographical-information-system-pvgis_en) or
 * [Irradiance data from Open Meteo](https://joint-research-centre.ec.europa.eu/photovoltaic-geographical-information-system-pvgis_en)
 
@@ -130,7 +130,7 @@ A full example looks like:
   ]
  }'
 ```
-Where you need to provide API_KEY, HOSTNAME and INSTALLATION_ID depending on you setup and provide a valid json payload.
+Where you need to provide API_KEY, HOSTNAME and INSTALLATION_ID depending on you setup and provide a valid json payload. The unit for the energy production is kilowatt-hours (kWh).
 
 Calling this endpoint will:
 1. Enrich and import pv_production data based on the provided time interval
@@ -138,9 +138,9 @@ Calling this endpoint will:
 
 > Re-importing will not delete any existing records in this time interval. Those need to be cleaned up manually
 
-### Delete pv production data
+### Delete PV production data
 
-An additional endpoint allows delete pv production data for an installation an a given time interval. To do so, call the following endpoint:
+An additional endpoint allows delete PV production data for an installation an a given time interval. To do so, call the following endpoint:
 
 
 ```
@@ -149,12 +149,12 @@ An additional endpoint allows delete pv production data for an installation an a
 
 Where you need to provide API_KEY, HOSTNAME and INSTALLATION_ID depending on you setup and define with FROM and TO as ISO datetime values the time interval to be deleted. This will:
 
-1. Delete pv production data for the given installation and time interval
+1. Delete PV production data for the given installation and time interval
 2. Re-Calculate monthly statistics for the given installation and time interval
 
-### Re-fetch pv production data
+### Re-fetch PV production data
 
-An additional endpoint allows re-fetching estimate pv production data for an installation an a given time interval. To do so, call the following endpoint:
+An additional endpoint allows re-fetching estimate PV production data for an installation an a given time interval. To do so, call the following endpoint:
 
 
 ```
@@ -175,7 +175,7 @@ To re-calculate the monthly statistics based on the data you can call the follow
 Where you need to provide API_KEY, HOSTNAME and INSTALLATION_ID depending on you setup and define with FROM and TO as ISO date values.
 
 ## Analyze statistics
-After importing pv production data, the monthly statistics can be analyzed based on different comparisons. The following charts should demonstrate the different charts.
+After importing PV production data, the monthly statistics can be analyzed based on different comparisons. The following charts should demonstrate the different charts.
 
 ### Measured vs. estimated production history
 
@@ -207,7 +207,7 @@ After importing pv production data, the monthly statistics can be analyzed based
 
 ## Status of the project
 
-The aim of this project was to provide a basic platform to be able to import. track and compare long term pv production data. The tool was created as an MVP in the context of a tegonal Open Source week in which the whole company tries to contribute to new or existing open source software. There is currently no upcoming work planned on the project. Please share your ideas, experiences or other inputs either [issues](https://github.com/tegonal/sun-set-analytics/issues), [discussions](https://github.com/tegonal/sun-set-analytics/discussions) or direct contributions.
+The aim of this project was to provide a basic platform to be able to import, track and compare long term PV production data. The tool was created as an MVP in the context of a Tegonal Open Source Week, in which the whole company contributes to new or existing open source software. There is currently no upcoming work planned on the project. Please share your ideas, experiences or other inputs either [issues](https://github.com/tegonal/sun-set-analytics/issues), [discussions](https://github.com/tegonal/sun-set-analytics/discussions) or direct contributions.
 
 # Contributors and contribute
 
