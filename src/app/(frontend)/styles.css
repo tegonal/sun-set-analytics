@@ -10,7 +10,6 @@ html {
   font-size: 18px;
   line-height: 32px;
 
-  background: rgb(0, 0, 0);
   -webkit-font-smoothing: antialiased;
 }
 
@@ -26,7 +25,6 @@ body {
   line-height: 32px;
 
   margin: 0;
-  color: rgb(1000, 1000, 1000);
 
   @media (max-width: 1024px) {
     font-size: 15px;
@@ -72,8 +70,6 @@ p {
 }
 
 a {
-  color: currentColor;
-
   &:focus {
     opacity: 0.8;
     outline: none;
@@ -117,12 +113,10 @@ svg {
   }
 
   .plotcontainer {
-    background: rgb(240, 240, 240);
-    color: rgb(0, 0, 0);
     padding: 20px;
   }
   .plot {
-      background: rgb(240, 240, 240);
+      background: rgb(255, 255, 255);
       color: rgb(0, 0, 0);
   }
 
