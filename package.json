@@ -62,7 +62,7 @@
       "sharp"
     ],
     "overrides": {
-      "drizzle-orm": "^0.41.0",
+      "drizzle-orm": "^0.43.0",
       "drizzle-proxy": "^0.41.0"
     }
   },
