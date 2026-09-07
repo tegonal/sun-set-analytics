@@ -28,7 +28,7 @@
     "libsql": "^0.5.5",
     "next": "15.3.0",
     "payload": "^3.34.0",
-    "payload-oapi": "0.2.0",
+    "payload-oapi": "0.2.5",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "sharp": "0.34.1",
